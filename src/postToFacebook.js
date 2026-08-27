@@ -5,7 +5,7 @@ import { renderPostImage } from "./renderImage.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CALENDAR_PATH = path.join(__dirname, "..", "content", "calendar.json");
-const GRAPH_API_VERSION = "v21.0";
+const GRAPH_API_VERSION = "v26.0";
 
 /** Returns today's date as YYYY-MM-DD in Asia/Ho_Chi_Minh timezone. */
 export function getTodayVN() {

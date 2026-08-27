@@ -39,9 +39,10 @@ never auto-published as placeholder content.
    select your app, and add these permissions: `pages_manage_posts`,
    `pages_read_engagement`, `pages_show_list`. Click **Generate Access Token**
    to get a short-lived **user** token.
-2. Exchange it for a long-lived user token:
+2. Exchange it for a long-lived user token (find `{app-id}`/`{app-secret}` under
+   **App settings → Basic** in the app dashboard):
    ```
-   GET https://graph.facebook.com/v21.0/oauth/access_token
+   GET https://graph.facebook.com/v26.0/oauth/access_token
      ?grant_type=fb_exchange_token
      &client_id={app-id}
      &client_secret={app-secret}
@@ -50,10 +51,22 @@ never auto-published as placeholder content.
 3. Use the long-lived user token to get your Page's access token (Page tokens
    obtained this way don't expire):
    ```
-   GET https://graph.facebook.com/v21.0/me/accounts?access_token={long-lived-user-token}
+   GET https://graph.facebook.com/v26.0/me/accounts?access_token={long-lived-user-token}
    ```
    The response includes each Page you manage with its `id` (this is
    `FB_PAGE_ID`) and its own `access_token` (this is `FB_PAGE_ACCESS_TOKEN`).
+
+   **If this returns an empty `data: []`**, the Page is likely owned by a
+   Business Portfolio rather than your personal account, so it won't show up
+   under `/me/accounts`. Generate the token again with the extra
+   `business_management` permission, then use:
+   ```
+   GET https://graph.facebook.com/v26.0/me/businesses?access_token={long-lived-user-token}
+   GET https://graph.facebook.com/v26.0/{business-id}/owned_pages?fields=id,name,access_token&access_token={long-lived-user-token}
+   ```
+   (Graph API version numbers bump roughly every 3 months and old ones retire
+   after ~2 years — check [developers.facebook.com/docs/graph-api/changelog](https://developers.facebook.com/docs/graph-api/changelog)
+   for the current version if these calls start failing.)
 
 ## 3. Add GitHub Secrets
 
