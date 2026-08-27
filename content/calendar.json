@@ -1,0 +1,113 @@
+[
+  {
+    "date": "2026-08-31",
+    "week": 1,
+    "pillar": "educational_hook",
+    "format": "infographic",
+    "status": "draft",
+    "topText": "MULTITASKING",
+    "bottomText": "PRODUCTIVE PROCRASTINATION",
+    "caption": "Multitasking isn't productivity. It's productive procrastination. Your brain can't actually do two focused things at once, it just switches back and forth, paying a tax every time. One task, one timer, one win at a time. That's the whole idea behind Pomobit."
+  },
+  {
+    "date": "2026-09-02",
+    "week": 1,
+    "pillar": "relatable",
+    "format": "quote_card",
+    "status": "draft",
+    "quoteText": "Your to-do list isn't guilt-tripping you. It's just badly designed.",
+    "caption": "Your to-do list isn't guilt-tripping you. It's just badly designed. A wall of 30 unsorted tasks isn't a plan, it's anxiety with bullet points. Pomobit breaks it down into sessions you can actually start."
+  },
+  {
+    "date": "2026-09-04",
+    "week": 1,
+    "pillar": "feature_demo",
+    "format": "video",
+    "status": "manual_needed",
+    "caption": "Here's exactly how a Pomobit session works, start to finish.",
+    "note": "Requires a screen-recorded demo video. Not auto-postable — record and post manually."
+  },
+  {
+    "date": "2026-09-07",
+    "week": 2,
+    "pillar": "educational_hook",
+    "format": "infographic",
+    "status": "draft",
+    "topText": "WILLPOWER",
+    "bottomText": "YOUR ENVIRONMENT",
+    "caption": "Willpower isn't the problem. Your environment is. You don't need more discipline, you need fewer decisions to make when your focus is already low."
+  },
+  {
+    "date": "2026-09-09",
+    "week": 2,
+    "pillar": "engagement",
+    "format": "text",
+    "status": "draft",
+    "caption": "What's the ONE habit you've been trying to build for months? Drop it below 👇"
+  },
+  {
+    "date": "2026-09-11",
+    "week": 2,
+    "pillar": "behind_the_scenes",
+    "format": "photo_text",
+    "status": "needs_review",
+    "caption": "Why I built Pomobit (and the mistake that taught me the most).",
+    "note": "Needs a real behind-the-scenes photo attached before this can go out. Currently no image on file."
+  },
+  {
+    "date": "2026-09-14",
+    "week": 3,
+    "pillar": "educational_hook",
+    "format": "infographic",
+    "status": "draft",
+    "topText": "MOTIVATION",
+    "bottomText": "THE 2-MINUTE RULE",
+    "caption": "The 2-minute rule that beats motivation every time. Don't wait to feel ready. Commit to 2 minutes."
+  },
+  {
+    "date": "2026-09-16",
+    "week": 3,
+    "pillar": "relatable",
+    "format": "quote_card",
+    "status": "draft",
+    "quoteText": "Burnout isn't from working too hard. It's from never truly stopping.",
+    "caption": "Burnout isn't from working too hard. It's from never truly stopping. The break isn't optional, it's part of the work."
+  },
+  {
+    "date": "2026-09-18",
+    "week": 3,
+    "pillar": "feature_demo",
+    "format": "video",
+    "status": "manual_needed",
+    "caption": "That feeling when your habit streak hits a new milestone.",
+    "note": "Requires a screen-recorded demo video. Not auto-postable — record and post manually."
+  },
+  {
+    "date": "2026-09-21",
+    "week": 4,
+    "pillar": "educational_hook",
+    "format": "infographic",
+    "status": "draft",
+    "topText": "YOUR PHONE",
+    "bottomText": "ABSENCE OF A PLAN",
+    "caption": "Your focus killer isn't your phone. It's the absence of a plan."
+  },
+  {
+    "date": "2026-09-23",
+    "week": 4,
+    "pillar": "engagement_or_testimonial",
+    "format": "text",
+    "status": "needs_review",
+    "caption": "What's the ONE habit you've been trying to build for months? Drop it below 👇",
+    "note": "Placeholder engagement post (repeats week 2 format). Replace with a real user testimonial if good outreach feedback comes in before this date, then flip status to draft."
+  },
+  {
+    "date": "2026-09-25",
+    "week": 4,
+    "pillar": "milestone",
+    "format": "photo_text",
+    "status": "needs_review",
+    "caption": "One month back into building Pomobit's community, here's what we've learned so far.",
+    "note": "Needs real milestone numbers (followers, sessions completed, etc.) and a photo filled in before this can go out."
+  }
+]

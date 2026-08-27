@@ -1,0 +1,18 @@
+{
+  "name": "pomobit-social",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated Facebook Page posting for Pomobit's 4-week content calendar",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dry-run": "node src/index.js --dry-run"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.53",
+    "dotenv": "^16.4.5"
+  }
+}
