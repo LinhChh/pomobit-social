@@ -36,6 +36,31 @@ test("generatePostContent returns only caption for engagement/text", async () =>
   assert.deepEqual(Object.keys(result), ["caption"]);
 });
 
+test("generatePostContent calls Claude with the default model when none is specified", async () => {
+  const client = makeMockClient({ caption: "What's blocking your focus today?" });
+  await generatePostContent({ pillar: "engagement", format: "text", client });
+  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-opus-5");
+});
+
+test("generatePostContent calls Claude with a caller-specified model", async () => {
+  const client = makeMockClient({ caption: "What's blocking your focus today?" });
+  await generatePostContent({ pillar: "engagement", format: "text", client, model: "claude-sonnet-5" });
+  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-sonnet-5");
+});
+
+test("runGenerateContent forwards a caller-specified model to every generated slot", async () => {
+  const client = makeMockClient({ caption: "What's blocking your focus today?" });
+  const slots = [
+    { date: "2026-10-05", week: 5, pillar: "engagement", format: "text" },
+    { date: "2026-10-07", week: 5, pillar: "engagement", format: "text" },
+  ];
+  await runGenerateContent({ slots, client, dryRun: true, model: "claude-haiku-4-5" });
+  assert.equal(client.messages.create.mock.calls.length, 2);
+  for (const call of client.messages.create.mock.calls) {
+    assert.equal(call.arguments[0].model, "claude-haiku-4-5");
+  }
+});
+
 test("generatePostContent throws for pillar/format combos that need real data (not AI-generatable)", async () => {
   const client = makeMockClient({});
   await assert.rejects(

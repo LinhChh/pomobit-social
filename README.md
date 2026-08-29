@@ -115,6 +115,9 @@ Claude instead of writing it by hand:
 # slots.json: an array of { "date", "week", "pillar", "format" } — no content yet
 node src/generateContent.js --slots slots.json --dry-run   # preview only
 node src/generateContent.js --slots slots.json             # appends to content/calendar.json
+
+# Defaults to claude-opus-5 — override with --model if you want a different one:
+node src/generateContent.js --slots slots.json --model claude-sonnet-5 --dry-run
 ```
 
 Generated entries always land with `status: "needs_review"` — read them over

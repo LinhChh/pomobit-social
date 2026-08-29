@@ -7,7 +7,7 @@ import "dotenv/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CALENDAR_PATH = path.join(__dirname, "..", "content", "calendar.json");
-const MODEL = "claude-opus-5";
+const DEFAULT_MODEL = "claude-opus-5";
 
 const BRAND_VOICE_SYSTEM_PROMPT = `You write Facebook posts for Pomobit, a focus/productivity timer app.
 Voice: direct, a little contrarian, no corporate tone, no emojis, no hashtags.
@@ -69,7 +69,7 @@ const CONTENT_TOOLS = {
  * (feature_demo, milestone, testimonials, behind_the_scenes) need real
  * evidence and must never be filled in by the model.
  */
-export async function generatePostContent({ pillar, format, client = new Anthropic() }) {
+export async function generatePostContent({ pillar, format, client = new Anthropic(), model = DEFAULT_MODEL }) {
   const expectedFormat = PILLAR_FORMATS[pillar];
   if (!expectedFormat || expectedFormat !== format) {
     throw new Error(
@@ -80,7 +80,7 @@ export async function generatePostContent({ pillar, format, client = new Anthrop
 
   const tool = CONTENT_TOOLS[format];
   const response = await client.messages.create({
-    model: MODEL,
+    model,
     max_tokens: 1024,
     system: BRAND_VOICE_SYSTEM_PROMPT,
     tools: [tool],
@@ -115,10 +115,16 @@ export function appendGeneratedEntries(calendar, newEntries) {
  * In --dry-run mode, prints the generated entries without touching the
  * calendar file.
  */
-export async function runGenerateContent({ slots, client, dryRun = false, calendarPath = DEFAULT_CALENDAR_PATH }) {
+export async function runGenerateContent({
+  slots,
+  client,
+  dryRun = false,
+  calendarPath = DEFAULT_CALENDAR_PATH,
+  model = DEFAULT_MODEL,
+}) {
   const generated = [];
   for (const slot of slots) {
-    const content = await generatePostContent({ pillar: slot.pillar, format: slot.format, client });
+    const content = await generatePostContent({ pillar: slot.pillar, format: slot.format, client, model });
     generated.push({ ...slot, ...content });
   }
 
@@ -137,17 +143,18 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const { values } = parseArgs({
     options: {
       slots: { type: "string" },
+      model: { type: "string" },
       "dry-run": { type: "boolean", default: false },
     },
   });
 
   if (!values.slots) {
-    console.error("Usage: node src/generateContent.js --slots <path-to-slots.json> [--dry-run]");
+    console.error("Usage: node src/generateContent.js --slots <path-to-slots.json> [--model <id>] [--dry-run]");
     process.exitCode = 1;
   } else {
     try {
       const slots = JSON.parse(await readFile(values.slots, "utf-8"));
-      await runGenerateContent({ slots, dryRun: values["dry-run"] });
+      await runGenerateContent({ slots, dryRun: values["dry-run"], model: values.model });
     } catch (error) {
       console.error("Failed to generate content:", error.message);
       process.exitCode = 1;
