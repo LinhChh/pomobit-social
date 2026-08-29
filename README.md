@@ -107,6 +107,26 @@ Just edit `content/calendar.json` — no code changes needed. Add new entries wi
 the same shape as the existing ones, and set `status: "draft"` once the content
 is ready to go out automatically.
 
+For the pillars that don't need real data — `educational_hook` (infographic),
+`relatable` (quote_card), `engagement` (text) — you can draft the caption with
+Claude instead of writing it by hand:
+
+```bash
+# slots.json: an array of { "date", "week", "pillar", "format" } — no content yet
+node src/generateContent.js --slots slots.json --dry-run   # preview only
+node src/generateContent.js --slots slots.json             # appends to content/calendar.json
+
+# Defaults to claude-sonnet-5. Set ANTHROPIC_MODEL in .env to change the
+# default, or override for a single run with --model:
+node src/generateContent.js --slots slots.json --model claude-opus-5 --dry-run
+```
+
+Generated entries always land with `status: "needs_review"` — read them over
+for tone/accuracy and flip to `"draft"` yourself before they can auto-post.
+Pillars that need real photos/video/data (`feature_demo`, `milestone`,
+testimonials, `behind_the_scenes`) aren't supported here — see the README's
+`.env.example` for the `ANTHROPIC_API_KEY` this needs.
+
 ## Project structure
 
 ```
