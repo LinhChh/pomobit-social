@@ -14,6 +14,7 @@
     "test:watch": "node --test --watch"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
     "@napi-rs/canvas": "^0.1.53",
     "dotenv": "^16.4.5"
   }
