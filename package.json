@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "dry-run": "node src/index.js --dry-run"
+    "dry-run": "node src/index.js --dry-run",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.53",
