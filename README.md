@@ -116,8 +116,9 @@ Claude instead of writing it by hand:
 node src/generateContent.js --slots slots.json --dry-run   # preview only
 node src/generateContent.js --slots slots.json             # appends to content/calendar.json
 
-# Defaults to claude-opus-5 — override with --model if you want a different one:
-node src/generateContent.js --slots slots.json --model claude-sonnet-5 --dry-run
+# Defaults to claude-sonnet-5. Set ANTHROPIC_MODEL in .env to change the
+# default, or override for a single run with --model:
+node src/generateContent.js --slots slots.json --model claude-opus-5 --dry-run
 ```
 
 Generated entries always land with `status: "needs_review"` — read them over

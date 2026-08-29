@@ -39,13 +39,35 @@ test("generatePostContent returns only caption for engagement/text", async () =>
 test("generatePostContent calls Claude with the default model when none is specified", async () => {
   const client = makeMockClient({ caption: "What's blocking your focus today?" });
   await generatePostContent({ pillar: "engagement", format: "text", client });
-  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-opus-5");
+  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-sonnet-5");
 });
 
 test("generatePostContent calls Claude with a caller-specified model", async () => {
   const client = makeMockClient({ caption: "What's blocking your focus today?" });
-  await generatePostContent({ pillar: "engagement", format: "text", client, model: "claude-sonnet-5" });
-  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-sonnet-5");
+  await generatePostContent({ pillar: "engagement", format: "text", client, model: "claude-opus-5" });
+  assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-opus-5");
+});
+
+test("generatePostContent falls back to ANTHROPIC_MODEL from the environment when no model arg is given", async () => {
+  const client = makeMockClient({ caption: "What's blocking your focus today?" });
+  process.env.ANTHROPIC_MODEL = "claude-haiku-4-5";
+  try {
+    await generatePostContent({ pillar: "engagement", format: "text", client });
+    assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-haiku-4-5");
+  } finally {
+    delete process.env.ANTHROPIC_MODEL;
+  }
+});
+
+test("generatePostContent prefers an explicit model arg over ANTHROPIC_MODEL from the environment", async () => {
+  const client = makeMockClient({ caption: "What's blocking your focus today?" });
+  process.env.ANTHROPIC_MODEL = "claude-haiku-4-5";
+  try {
+    await generatePostContent({ pillar: "engagement", format: "text", client, model: "claude-opus-5" });
+    assert.equal(client.messages.create.mock.calls[0].arguments[0].model, "claude-opus-5");
+  } finally {
+    delete process.env.ANTHROPIC_MODEL;
+  }
 });
 
 test("runGenerateContent forwards a caller-specified model to every generated slot", async () => {

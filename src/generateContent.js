@@ -7,7 +7,12 @@ import "dotenv/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_CALENDAR_PATH = path.join(__dirname, "..", "content", "calendar.json");
-const DEFAULT_MODEL = "claude-opus-5";
+const DEFAULT_MODEL = "claude-sonnet-5";
+
+/** Reads ANTHROPIC_MODEL from the environment, falling back to DEFAULT_MODEL. */
+function resolveDefaultModel() {
+  return process.env.ANTHROPIC_MODEL || DEFAULT_MODEL;
+}
 
 const BRAND_VOICE_SYSTEM_PROMPT = `You write Facebook posts for Pomobit, a focus/productivity timer app.
 Voice: direct, a little contrarian, no corporate tone, no emojis, no hashtags.
@@ -69,7 +74,7 @@ const CONTENT_TOOLS = {
  * (feature_demo, milestone, testimonials, behind_the_scenes) need real
  * evidence and must never be filled in by the model.
  */
-export async function generatePostContent({ pillar, format, client = new Anthropic(), model = DEFAULT_MODEL }) {
+export async function generatePostContent({ pillar, format, client = new Anthropic(), model = resolveDefaultModel() }) {
   const expectedFormat = PILLAR_FORMATS[pillar];
   if (!expectedFormat || expectedFormat !== format) {
     throw new Error(
@@ -120,7 +125,7 @@ export async function runGenerateContent({
   client,
   dryRun = false,
   calendarPath = DEFAULT_CALENDAR_PATH,
-  model = DEFAULT_MODEL,
+  model = resolveDefaultModel(),
 }) {
   const generated = [];
   for (const slot of slots) {
