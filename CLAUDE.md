@@ -110,9 +110,13 @@ node src/index.js --date 2026-08-31 --dry-run  # xem thử 1 post mà không g�
   entry có `date`, `pillar`, `format` (`infographic` | `quote_card` | `text` |
   `video` | `photo_text`), `caption`, và `status`.
 - **`status`**: `"draft"` (sẵn sàng đăng tự động) | `"manual_needed"` (cần quay
-  video, đăng tay) | `"needs_review"` (cần điền số liệu/ảnh thật trước khi đăng).
+  video, đăng tay) | `"needs_review"` (cần điền số liệu/ảnh thật trước khi đăng) |
+  `"posted"` (đã đăng rồi — thường do đăng tay sớm hơn lịch — skip để tránh đăng
+  trùng) | `"needs_review"` cũng là status mặc định cho content do AI generate
+  (`src/generateContent.js`), không tự chuyển sang `"draft"`.
   **Không bao giờ tự đăng nội dung placeholder** — `manual_needed`/`needs_review`
-  luôn bị skip kèm cảnh báo (`src/postToFacebook.js`).
+  luôn bị skip kèm cảnh báo, `posted` bị skip kèm log thông tin
+  (`src/postToFacebook.js`).
 - **Timezone**: mọi logic "hôm nay" dùng giờ Việt Nam (`Asia/Ho_Chi_Minh`) qua
   `Intl.DateTimeFormat`, không dùng `Date` theo giờ máy chạy (GitHub Actions chạy
   UTC).

@@ -66,10 +66,10 @@ async function postFeedMessage({ pageId, accessToken, message }) {
  * renders its image if needed, and posts it to the configured Facebook Page.
  * Skips posts flagged manual_needed/needs_review instead of publishing placeholder content.
  */
-export async function runScheduledPost({ date, dryRun = false, pageId, accessToken } = {}) {
+export async function runScheduledPost({ date, dryRun = false, pageId, accessToken, calendar } = {}) {
   const targetDate = date ?? getTodayVN();
-  const calendar = await loadCalendar();
-  const post = findPostForDate(calendar, targetDate);
+  const activeCalendar = calendar ?? (await loadCalendar());
+  const post = findPostForDate(activeCalendar, targetDate);
 
   if (!post) {
     console.log(`No post scheduled for ${targetDate}. Nothing to do.`);
@@ -77,6 +77,11 @@ export async function runScheduledPost({ date, dryRun = false, pageId, accessTok
   }
 
   console.log(`Found post for ${targetDate}: pillar="${post.pillar}" format="${post.format}" status="${post.status}"`);
+
+  if (post.status === "posted") {
+    console.log(`Post for ${targetDate} has already been posted. Skipping.`);
+    return { skipped: true, reason: "posted", date: targetDate, post };
+  }
 
   if (post.status === "manual_needed" || post.status === "needs_review") {
     console.warn(
