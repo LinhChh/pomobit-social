@@ -24,7 +24,7 @@
     "pillar": "feature_demo",
     "format": "text",
     "status": "draft",
-    "caption": "Pomobit in one sentence: you pick one task, start a timer, and every finished session adds to a streak you don't want to break. No feed, no badges, no 400 settings to configure first. Open it, start, done."
+    "caption": "Pomobit in one sentence: a Pomodoro timer and a habit tracker in the same app. Pick a task, run one focused session, and it logs as a rep of the habit you're building. No feed, no badges, no 400 settings to configure first."
   },
   {
     "date": "2026-09-07",
@@ -50,8 +50,8 @@
     "pillar": "behind_the_scenes",
     "format": "quote_card",
     "status": "draft",
-    "quoteText": "I tried every timer app first. They all let me cheat.",
-    "caption": "I tried every timer app first. They all let me cheat, pause it, skip it, pretend the last hour counted. So I built one where skipping a session breaks a streak you can see. Mild accountability beat raw willpower every time."
+    "quoteText": "I didn't need another timer. I needed the timer to mean something.",
+    "caption": "I tried every Pomodoro app first. They all just counted minutes down and forgot about it. So I built Pomobit: each focused session logs as a rep of a habit you're actually trying to build, not just a countdown you'll forget by tomorrow."
   },
   {
     "date": "2026-09-14",
@@ -80,7 +80,7 @@
     "status": "draft",
     "topText": "ONE BIG PUSH",
     "bottomText": "SHOWING UP DAILY",
-    "caption": "Consistency beats intensity. 25 focused minutes you'll repeat tomorrow beat a 3-hour grind you dread and never do again. That's why Pomobit counts streaks, not hours."
+    "caption": "Consistency beats intensity. 25 focused minutes you'll repeat tomorrow beat a 3-hour grind you dread and never do again. Pomobit is built around that: small repeatable sessions that add up to a habit."
   },
   {
     "date": "2026-09-21",
@@ -107,6 +107,6 @@
     "format": "quote_card",
     "status": "draft",
     "quoteText": "Progress you can't see feels like progress you didn't make.",
-    "caption": "Progress you can't see feels like progress you didn't make. A day of real focus can still feel like nothing happened. Pomobit keeps the count, so the effort is visible even on the slow days."
+    "caption": "Progress you can't see feels like progress you didn't make. A day of real focus can still feel like nothing happened. Pomobit pairs each session with the habit you're building, so the small stuff shows up somewhere you can see it."
   }
 ]
