@@ -24,7 +24,7 @@
     "pillar": "feature_demo",
     "format": "text",
     "status": "draft",
-    "caption": "Here's exactly how a Pomobit session works, start to finish. Pick one task. Start the timer. Work until it rings, no tab-switching, no \"quick checks\". When the break hits, actually stop. Repeat. Every completed session feeds your streak, so the progress is visible instead of vanishing into a busy day."
+    "caption": "Pomobit in one sentence: you pick one task, start a timer, and every finished session adds to a streak you don't want to break. No feed, no badges, no 400 settings to configure first. Open it, start, done."
   },
   {
     "date": "2026-09-07",
@@ -50,8 +50,8 @@
     "pillar": "behind_the_scenes",
     "format": "quote_card",
     "status": "draft",
-    "quoteText": "I built Pomobit because every other timer let me lie to myself about \"just one more tab\".",
-    "caption": "Why I built Pomobit, in one line: every other timer let me lie to myself about \"just one more tab\". So I made one that ties every session to a streak I don't want to break. Turns out a little accountability beats a lot of willpower."
+    "quoteText": "I tried every timer app first. They all let me cheat.",
+    "caption": "I tried every timer app first. They all let me cheat, pause it, skip it, pretend the last hour counted. So I built one where skipping a session breaks a streak you can see. Mild accountability beat raw willpower every time."
   },
   {
     "date": "2026-09-14",
@@ -75,11 +75,12 @@
   {
     "date": "2026-09-18",
     "week": 3,
-    "pillar": "feature_demo",
-    "format": "quote_card",
+    "pillar": "educational_hook",
+    "format": "infographic",
     "status": "draft",
-    "quoteText": "A streak you can see is a promise you don't want to break.",
-    "caption": "That feeling when your habit streak hits a new milestone. Pomobit keeps the count in front of you, so skipping a day costs something visible. Small pressure, big consistency."
+    "topText": "ONE BIG PUSH",
+    "bottomText": "SHOWING UP DAILY",
+    "caption": "Consistency beats intensity. 25 focused minutes you'll repeat tomorrow beat a 3-hour grind you dread and never do again. That's why Pomobit counts streaks, not hours."
   },
   {
     "date": "2026-09-21",
@@ -105,7 +106,7 @@
     "pillar": "relatable",
     "format": "quote_card",
     "status": "draft",
-    "quoteText": "You don't need a better morning routine. You need one session you actually finish.",
-    "caption": "A month of building in public taught us one thing: nobody's stuck for lack of tips. They're stuck because the day never has a clear starting point. Pick one task, start one timer. That's the routine."
+    "quoteText": "Progress you can't see feels like progress you didn't make.",
+    "caption": "Progress you can't see feels like progress you didn't make. A day of real focus can still feel like nothing happened. Pomobit keeps the count, so the effort is visible even on the slow days."
   }
 ]
