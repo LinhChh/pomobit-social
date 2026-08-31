@@ -22,10 +22,9 @@
     "date": "2026-09-04",
     "week": 1,
     "pillar": "feature_demo",
-    "format": "video",
-    "status": "manual_needed",
-    "caption": "Here's exactly how a Pomobit session works, start to finish.",
-    "note": "Requires a screen-recorded demo video. Not auto-postable — record and post manually."
+    "format": "text",
+    "status": "draft",
+    "caption": "Here's exactly how a Pomobit session works, start to finish. Pick one task. Start the timer. Work until it rings, no tab-switching, no \"quick checks\". When the break hits, actually stop. Repeat. Every completed session feeds your streak, so the progress is visible instead of vanishing into a busy day."
   },
   {
     "date": "2026-09-07",
@@ -49,10 +48,10 @@
     "date": "2026-09-11",
     "week": 2,
     "pillar": "behind_the_scenes",
-    "format": "photo_text",
-    "status": "needs_review",
-    "caption": "Why I built Pomobit (and the mistake that taught me the most).",
-    "note": "Needs a real behind-the-scenes photo attached before this can go out. Currently no image on file."
+    "format": "quote_card",
+    "status": "draft",
+    "quoteText": "I built Pomobit because every other timer let me lie to myself about \"just one more tab\".",
+    "caption": "Why I built Pomobit, in one line: every other timer let me lie to myself about \"just one more tab\". So I made one that ties every session to a streak I don't want to break. Turns out a little accountability beats a lot of willpower."
   },
   {
     "date": "2026-09-14",
@@ -77,10 +76,10 @@
     "date": "2026-09-18",
     "week": 3,
     "pillar": "feature_demo",
-    "format": "video",
-    "status": "manual_needed",
-    "caption": "That feeling when your habit streak hits a new milestone.",
-    "note": "Requires a screen-recorded demo video. Not auto-postable — record and post manually."
+    "format": "quote_card",
+    "status": "draft",
+    "quoteText": "A streak you can see is a promise you don't want to break.",
+    "caption": "That feeling when your habit streak hits a new milestone. Pomobit keeps the count in front of you, so skipping a day costs something visible. Small pressure, big consistency."
   },
   {
     "date": "2026-09-21",
@@ -95,19 +94,18 @@
   {
     "date": "2026-09-23",
     "week": 4,
-    "pillar": "engagement_or_testimonial",
+    "pillar": "engagement",
     "format": "text",
-    "status": "needs_review",
-    "caption": "What's the ONE habit you've been trying to build for months? Drop it below 👇",
-    "note": "Placeholder engagement post (repeats week 2 format). Replace with a real user testimonial if good outreach feedback comes in before this date, then flip status to draft."
+    "status": "draft",
+    "caption": "Quick one: what time of day do you actually focus best? Morning, late night, or that weird 2pm window nobody talks about? 👇"
   },
   {
     "date": "2026-09-25",
     "week": 4,
-    "pillar": "milestone",
-    "format": "photo_text",
-    "status": "needs_review",
-    "caption": "One month back into building Pomobit's community, here's what we've learned so far.",
-    "note": "Needs real milestone numbers (followers, sessions completed, etc.) and a photo filled in before this can go out."
+    "pillar": "relatable",
+    "format": "quote_card",
+    "status": "draft",
+    "quoteText": "You don't need a better morning routine. You need one session you actually finish.",
+    "caption": "A month of building in public taught us one thing: nobody's stuck for lack of tips. They're stuck because the day never has a clear starting point. Pick one task, start one timer. That's the routine."
   }
 ]
