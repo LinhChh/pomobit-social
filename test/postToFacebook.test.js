@@ -128,6 +128,16 @@ test("runScheduledPost does not mark posted when the Graph API returns an error"
   assert.equal(written[0].status, "draft");
 });
 
+test("runScheduledPost publishes a text entry as a rendered photo, not a plain feed message", async (t) => {
+  const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
+  const calendarPath = await makeCalendarFile([{ ...draftTextEntry, cardText: "One task. One timer." }]);
+
+  await runScheduledPost({ date: "2026-09-09", calendarPath, pageId: "PAGE", accessToken: "TOKEN" });
+
+  assert.equal(fetchMock.mock.callCount(), 1);
+  assert.match(fetchMock.mock.calls[0].arguments[0], /\/PAGE\/photos$/);
+});
+
 test("re-running the same day skips the already-posted entry without a duplicate Facebook call", async (t) => {
   const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
   const calendarPath = await makeCalendarFile([draftTextEntry]);

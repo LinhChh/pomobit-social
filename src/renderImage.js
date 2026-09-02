@@ -161,10 +161,50 @@ export async function renderQuoteCard({ quoteText, outPath }) {
   return writePng(canvas, outPath);
 }
 
+export async function renderTextCard({ text, outPath }) {
+  registerFonts();
+  const canvas = createCanvas(SIZE, SIZE);
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(0, 0, SIZE, SIZE);
+
+  drawBrand(ctx, COLORS.darkBrown);
+
+  // Short accent rule under the brand — distinguishes this from the quote card,
+  // which leads with a large quotation mark instead.
+  ctx.strokeStyle = COLORS.accentOrange;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(SIZE / 2 - 44, 112);
+  ctx.lineTo(SIZE / 2 + 44, 112);
+  ctx.stroke();
+
+  ctx.fillStyle = COLORS.darkBrown;
+  ctx.font = "600 60px 'Poppins SemiBold'";
+  const maxTextWidth = SIZE - 200;
+  const lineHeight = 78;
+  const lines = wrapText(ctx, text, maxTextWidth);
+  const startY = SIZE / 2 - ((lines.length - 1) * lineHeight) / 2;
+  drawWrappedText(ctx, text, {
+    x: SIZE / 2,
+    y: startY,
+    maxWidth: maxTextWidth,
+    lineHeight,
+  });
+
+  return writePng(canvas, outPath);
+}
+
+/** The text to render on a `text` post's image: `cardText` if set, else the caption. */
+export function textCardContent(post) {
+  return post.cardText ?? post.caption;
+}
+
 /**
  * Dispatches rendering based on post.format. Returns the output image path,
- * or null when the format doesn't require a rendered image (text/video/photo_text —
- * those rely on plain text or a manually-provided photo instead).
+ * or null for the two formats that carry manually-produced media instead of a
+ * rendered image (video/photo_text).
  */
 export async function renderPostImage(post) {
   const outPath = path.join(OUTPUT_DIR, `${post.date}.png`);
@@ -182,6 +222,10 @@ export async function renderPostImage(post) {
         outPath,
       });
     case "text":
+      return renderTextCard({
+        text: textCardContent(post),
+        outPath,
+      });
     case "video":
     case "photo_text":
       return null;

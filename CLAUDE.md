@@ -123,8 +123,12 @@ node src/index.js --date 2026-08-31 --dry-run  # xem thử 1 post mà không g�
   UTC).
 - **Ảnh** luôn render 1080x1080 PNG (chuẩn FB feed) bằng `@napi-rs/canvas`, font
   bundle sẵn trong `assets/fonts/` để không phụ thuộc font cài trên máy CI.
+  `infographic`/`quote_card`/`text` đều có renderer (`text` dùng `cardText` nếu
+  có, không thì `caption`); chỉ `video`/`photo_text` là không render (cần media
+  thật).
 - **Gọi Graph API** bằng `fetch` built-in, không thêm HTTP client. Có ảnh → `POST
-  /{page-id}/photos` (multipart); không ảnh → `POST /{page-id}/feed`.
+  /{page-id}/photos` (multipart); `POST /{page-id}/feed` chỉ là fallback khi
+  `renderPostImage` trả `null`.
 - **Graph API version** hiện tại: `v26.0` (hardcode trong
   `src/postToFacebook.js`), bump định kỳ theo changelog của Meta khi version cũ
   bị retire.
