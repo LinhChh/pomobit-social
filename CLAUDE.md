@@ -111,8 +111,9 @@ node src/index.js --date 2026-08-31 --dry-run  # xem thử 1 post mà không g�
   `video` | `photo_text`), `caption`, và `status`.
 - **`status`**: `"draft"` (sẵn sàng đăng tự động) | `"manual_needed"` (cần quay
   video, đăng tay) | `"needs_review"` (cần điền số liệu/ảnh thật trước khi đăng) |
-  `"posted"` (đã đăng rồi — thường do đăng tay sớm hơn lịch — skip để tránh đăng
-  trùng) | `"needs_review"` cũng là status mặc định cho content do AI generate
+  `"posted"` (đã đăng rồi — `runScheduledPost` tự set + commit lại vào
+  `calendar.json` sau khi đăng thành công, hoặc set tay khi đăng sớm hơn lịch —
+  skip để tránh đăng trùng khi workflow chạy trễ/retry) | `"needs_review"` cũng là status mặc định cho content do AI generate
   (`src/generateContent.js`), không tự chuyển sang `"draft"`.
   **Không bao giờ tự đăng nội dung placeholder** — `manual_needed`/`needs_review`
   luôn bị skip kèm cảnh báo, `posted` bị skip kèm log thông tin

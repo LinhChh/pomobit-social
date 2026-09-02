@@ -2,9 +2,10 @@
 
 Automates posting Pomobit's 4-week content calendar to its Facebook Page: renders
 infographic/quote-card images, posts via the Facebook Graph API, and runs on a
-GitHub Actions cron schedule (Mon/Wed/Fri, 19:00 Vietnam time). Posts that need a
-real video or real data (testimonials, milestone numbers) are flagged so they are
-never auto-published as placeholder content.
+GitHub Actions cron schedule (Mon/Wed/Fri, with a primary run at 11:00 and a
+fallback at 16:00 Vietnam time). Posts that need a real video or real data
+(testimonials, milestone numbers) are flagged so they are never auto-published as
+placeholder content.
 
 ## How it works
 
@@ -14,15 +15,19 @@ never auto-published as placeholder content.
   - `draft` — ready to auto-post.
   - `manual_needed` — needs a real video, must be posted by hand.
   - `needs_review` — needs real data/photo filled in before it can post.
+  - `posted` — already published; skipped. Set automatically after a successful
+    post (and committed back to `content/calendar.json`), so a delayed or retried
+    workflow run the same day never double-posts.
 - `src/renderImage.js` renders 1080x1080 PNGs for `infographic` and `quote_card`
   posts using `@napi-rs/canvas`, with fonts bundled in `assets/fonts/` so
   rendering doesn't depend on fonts installed on the CI machine.
 - `src/postToFacebook.js` finds today's post (Vietnam time, or `--date` override),
-  skips anything `manual_needed`/`needs_review` with a warning, and calls the
-  Graph API: `POST /{page-id}/photos` when there's an image, or
-  `POST /{page-id}/feed` for plain-text posts.
-- `.github/workflows/scheduled-post.yml` runs it on a cron schedule and can also
-  be triggered manually.
+  skips anything `manual_needed`/`needs_review`/`posted` with a log line, calls the
+  Graph API (`POST /{page-id}/photos` when there's an image, `POST /{page-id}/feed`
+  for plain-text posts), then flips the entry to `posted` in the calendar file.
+- `.github/workflows/scheduled-post.yml` runs it on a cron schedule (primary +
+  fallback), commits the `posted` status back to the repo, and can also be
+  triggered manually with an optional `date` input.
 
 ## 1. Create a Meta Developer App
 
@@ -96,10 +101,18 @@ Rendered images are written to `output/` (gitignored).
 
 ## 5. Running on GitHub Actions
 
-The workflow runs automatically on the cron schedule, and can also be triggered
-manually from the **Actions** tab → **Scheduled Facebook Post** → **Run workflow**
-(uses `workflow_dispatch`). Rendered images are uploaded as a workflow artifact
-for inspection.
+The workflow runs automatically on the cron schedule — a primary run at 04:00 UTC
+(11:00 VN) and a fallback at 09:00 UTC (16:00 VN) on Mon/Wed/Fri. GitHub often
+delays scheduled runs by hours, so the schedule is deliberately early: a run that
+slips past 17:00 UTC is already the next day in Vietnam time and would find no
+post. The fallback covers the primary run being dropped entirely; the first run
+to succeed flips the entry to `posted` (committed back to the repo), so the
+second run is a no-op.
+
+It can also be triggered manually from the **Actions** tab → **Scheduled Facebook
+Post** → **Run workflow**, with an optional **date** input (`YYYY-MM-DD`) to
+publish a specific day instead of today. Rendered images are uploaded as a
+workflow artifact for inspection.
 
 ## 6. Adding next month's calendar
 
