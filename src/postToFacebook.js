@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderPostImage } from "./renderImage.js";
@@ -18,13 +18,26 @@ export function getTodayVN() {
   return formatter.format(new Date());
 }
 
-export async function loadCalendar() {
-  const raw = await readFile(CALENDAR_PATH, "utf-8");
+export async function loadCalendar(calendarPath = CALENDAR_PATH) {
+  const raw = await readFile(calendarPath, "utf-8");
   return JSON.parse(raw);
 }
 
 export function findPostForDate(calendar, date) {
   return calendar.find((post) => post.date === date) ?? null;
+}
+
+/**
+ * Re-reads the calendar file and flips the entry for `date` to
+ * status: "posted", so a late-firing or retried workflow run in the same
+ * day won't publish the same post twice.
+ */
+async function markAsPosted(calendarPath, date) {
+  const calendar = await loadCalendar(calendarPath);
+  const entry = calendar.find((post) => post.date === date);
+  if (!entry || entry.status === "posted") return;
+  entry.status = "posted";
+  await writeFile(calendarPath, `${JSON.stringify(calendar, null, 2)}\n`);
 }
 
 async function postPhoto({ pageId, accessToken, imagePath, caption }) {
@@ -65,10 +78,23 @@ async function postFeedMessage({ pageId, accessToken, message }) {
  * Finds the post scheduled for `date` (or today in VN time if omitted),
  * renders its image if needed, and posts it to the configured Facebook Page.
  * Skips posts flagged manual_needed/needs_review instead of publishing placeholder content.
+ * After a successful post, flips the entry's status to "posted" in the calendar
+ * file so a duplicate run the same day is a no-op.
  */
-export async function runScheduledPost({ date, dryRun = false, pageId, accessToken, calendar } = {}) {
+export async function runScheduledPost({
+  date,
+  dryRun = false,
+  pageId,
+  accessToken,
+  calendar,
+  calendarPath,
+} = {}) {
   const targetDate = date ?? getTodayVN();
-  const activeCalendar = calendar ?? (await loadCalendar());
+  const resolvedPath = calendarPath ?? CALENDAR_PATH;
+  const activeCalendar = calendar ?? (await loadCalendar(resolvedPath));
+  // Only write status back when we own a real file: either an explicit path, or
+  // the default file we just loaded. An in-memory calendar is the caller's to persist.
+  const writebackPath = calendar && !calendarPath ? null : resolvedPath;
   const post = findPostForDate(activeCalendar, targetDate);
 
   if (!post) {
@@ -111,5 +137,11 @@ export async function runScheduledPost({ date, dryRun = false, pageId, accessTok
     : await postFeedMessage({ pageId, accessToken, message: post.caption });
 
   console.log("Posted to Facebook:", result);
+
+  if (writebackPath) {
+    await markAsPosted(writebackPath, targetDate);
+    console.log(`Marked ${targetDate} as posted in ${path.basename(writebackPath)}.`);
+  }
+
   return { skipped: false, date: targetDate, post, imagePath, result };
 }
