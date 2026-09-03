@@ -1,6 +1,6 @@
 # Chiến lược xây dựng social cho Pomobit — Tình hình & Kế hoạch
 
-_Cập nhật: 2026-09-03_
+_Cập nhật: 2026-09-03 (rev. 2 — chốt hướng Ken Burns MVP)_
 
 Tài liệu này chốt lại hiện trạng kênh Facebook của Pomobit, chẩn đoán vì sao
 reach đang gần bằng 0, và định hướng đi tiếp. Nguồn dữ liệu: Meta Business Suite,
@@ -93,18 +93,68 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
 
 ## 4. Định hướng đi tiếp
 
-### Ưu tiên 1 — FB/IG Reels (video dọc)
+### Ưu tiên 1 — FB/IG Reels, bản MVP "Ken Burns"
 **Lý do**: đây là kênh organic **duy nhất** phát nội dung tới người *chưa follow*
 mà không cần audience sẵn hoặc tiền. Ảnh tĩnh thì không.
 
-- **Issue [#17](https://github.com/LinhChh/pomobit-social/issues/17)** — Render
-  video dọc 1080×1920 từ nội dung card (`@napi-rs/canvas` → `ffmpeg` qua
-  `ffmpeg-static`), text reveal từng dòng + vòng timer Pomodoro + nhạc
-  royalty-free bundle sẵn.
+**MVP = không dựng animation phức tạp.** Lấy card 1080×1920 render 1 lần, thêm
+zoom/pan chậm (hiệu ứng Ken Burns) + nhạc CC0, xuất clip 8–12s bằng **một lệnh
+ffmpeg** — không có vòng lặp render frame, rủi ro tài nguyên gần như bằng 0.
+Thuật toán Reels vẫn coi là video → vẫn được đẩy tới non-follower. Mục tiêu bước
+này là **test giả thuyết "Reels reach cold audience tốt hơn ảnh tĩnh"** trước khi
+đầu tư thêm.
+
+- **Issue [#17](https://github.com/LinhChh/pomobit-social/issues/17)** — Renderer
+  Ken Burns: `ffmpeg -loop 1 -i card.png -i music.mp3 -vf "scale,zoompan" -t 10
+  -shortest`. POC local trước → renderer + test clip 2s → `format: "reel"` trong
+  `calendar.json`.
 - **Issue [#18](https://github.com/LinhChh/pomobit-social/issues/18)** — Publish
   Reels lên Page qua `POST /{page-id}/video_reels` (resumable upload 3 bước).
-- **Nhịp mục tiêu**: 1 Reel/ngày sau khi renderer xong. Kỳ vọng: sau 10–20 Reels
-  có 1–2 cái đạt vài trăm view.
+- **Chạy trên GitHub Actions hiện tại** (ubuntu-latest có sẵn `ffmpeg`). Không
+  chuyển hạ tầng ở bước này.
+- Nâng cấp animation (`ffmpeg drawtext` text reveal + vòng timer Pomodoro) là
+  **Phase 3**, chỉ làm nếu MVP cho tín hiệu tốt.
+
+#### Kế hoạch test — volume & lịch
+| | Nội dung | Tần suất | 4 tuần |
+|---|---|---|---|
+| **Reels (mới)** | Ken Burns trên card, 8–12s | 1/ngày, Thứ 2–6 (5/tuần) | 20 Reels |
+| Ảnh tĩnh (giữ nguyên) | `calendar.json` hiện tại | Thứ 2/4/6 | baseline để so sánh |
+
+- Tối thiểu **16 Reels** (Thứ 2/4/6 + Thứ 7 = 4/tuần) mới đủ đọc tín hiệu. Dưới
+  ~10 thì chưa kết luận được gì; dưới ~4/tuần thì tài khoản trông inactive.
+- Giờ đăng: 1 slot cố định, **không tối ưu giờ trong giai đoạn MVP**.
+- **Không boost** trong suốt test.
+- **Nút thắt nội dung**: 20 Reels cần ~20 câu ngắn, `calendar.json` mới có ~12.
+  Cần batch-generate thêm ~15 one-liner/hook bằng `src/generateContent.js` →
+  review → thêm entry `format: "reel"` (`status: draft`). Không lặp lại y nguyên
+  1 câu.
+
+#### Timeline
+| Giai đoạn | Thời gian (dự kiến) | Việc |
+|---|---|---|
+| Build #17 + #18 | ~1 tuần (3/9 → ~10/9) | Renderer Ken Burns + đăng Reels |
+| Chạy test Reels | ~4 tuần (~10/9 → ~8/10) | Automation tự đăng, gom số liệu |
+| Checkpoint sớm | ~tuần 3 (~15 Reels) | Nếu Reels cũng chết 1 chữ số → dừng, pivot |
+| Đánh giá gate | ~đầu/giữa 10/2026 | Quyết Phase 3 |
+
+Việc nặng là **upfront** (code + soạn nội dung). Sau đó automation tự chạy, chỉ
+vào xem analytics. Ảnh tĩnh M/W/F giữ nguyên — không "test" lại, chúng đã là
+baseline (~1–2 non-follower reach).
+
+#### Gate đánh giá
+| Kết quả sau ~15–20 Reels | Kết luận |
+|---|---|
+| Median non-follower views/Reel **> ~30** VÀ ≥1 Reel **> 200 views** | Reels có tác dụng → sang Phase 3 (renderer `drawtext`) |
+| Reels cũng kẹt 1 chữ số như ảnh tĩnh | Page bị FB quality-flag → cân nhắc lập Page mới sạch, hoặc pivot TikTok/IG/Pinterest |
+
+Kỳ vọng: Reels ≥ 3–5× non-follower views của ảnh tĩnh.
+
+#### Phương án hạ tầng (nếu CI đụng trần thật)
+Không chuyển vội. Nếu MVP Ken Burns chạy xanh trên Actions → ở lại. Nếu đụng trần
+tài nguyên khi nâng lên animation → migrate **VPS + crontab** (Hetzner ~$4/tháng,
+persistent disk giải quyết luôn writeback `calendar.json`) hoặc **Cloud Run
+Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất `workflow_dispatch`.
 
 ### Ưu tiên 2 (pending research) — Pinterest
 - Search-driven, pin sống nhiều tháng, reach tốt kể cả khi 0 follower.
@@ -156,16 +206,32 @@ mà không cần audience sẵn hoặc tiền. Ảnh tĩnh thì không.
 | Prune follower fake hay bỏ qua | Quyết sau khi thử remove ~20 account xem có dễ không |
 | Ngân sách ads | Nếu có: $3–5 boost cho **1 Reel đã chứng minh tốt**, target VN/English + productivity, để seed ~30–60 follower thật |
 | Nhạc cho video | Chọn 1 track CC0, ghi license trong `assets/audio/` (Issue #17) |
+| Nội dung cho 20 Reels | `calendar.json` mới có ~12 entry — cần soạn thêm ~15 câu ngắn trước khi test |
 | Pinterest API | Research: business account, quyền API, rate limit |
 
 ---
 
 ## 7. Next actions
 
-- [ ] Làm **Issue #17** (renderer video) — `/start-issue 17`
-- [ ] Làm **Issue #18** (publish Reels) — sau #17
+**Trước khi build:**
 - [ ] Kiểm tra tab "Posts" bằng incognito/mobile để xác nhận chỉ là cache
-- [ ] Thử remove 10–20 follower fake, đánh giá độ khả thi
+- [ ] Soạn ~15 câu one-liner/hook cho Reels → thêm entry `format: "reel"` vào `calendar.json`
+
+**Build (~1 tuần):**
+- [ ] **Issue #17** — renderer Ken Burns MVP — `/start-issue 17`
+- [ ] **Issue #18** — publish Reels qua Graph API — sau #17
+- [ ] Bump lịch cron lên 5 ngày/tuần (Thứ 2–6) cho Reels
+
+**Test (~4 tuần, ~10/9 → ~8/10):**
+- [ ] Automation đăng 16–20 Reels, giữ ảnh tĩnh M/W/F làm baseline
+- [ ] Không boost
+- [ ] Checkpoint tuần 3 (~15 Reels): Reels chết 1 chữ số → dừng, pivot
+
+**Đánh giá (đầu/giữa 10/2026):**
+- [ ] Median non-follower views/Reel > ~30 và ≥1 Reel > 200 → Phase 3 (renderer `drawtext`)
+- [ ] Không → quyết lập Page mới hay pivot nền tảng
+
+**Song song:**
 - [ ] Research Pinterest API → tạo issue nếu khả thi
-- [ ] Sau 3 tuần chạy Reels: review reach/views, quyết định có giữ Page này hay lập mới
+- [ ] Thử remove 10–20 follower fake, đánh giá độ khả thi
 - [ ] Quyết ngân sách ads
