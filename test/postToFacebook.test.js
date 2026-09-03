@@ -138,6 +138,41 @@ test("runScheduledPost publishes a text entry as a rendered photo, not a plain f
   assert.match(fetchMock.mock.calls[0].arguments[0], /\/PAGE\/photos$/);
 });
 
+const reelEntry = {
+  date: "2026-09-16",
+  pillar: "engagement",
+  format: "reel",
+  status: "draft",
+  cardText: "What's the ONE habit you've been trying to build?",
+  caption: "Drop it below 👇",
+  durationSec: 2,
+};
+
+test("runScheduledPost --dry-run renders a reel video and logs the path without calling the API", async (t) => {
+  const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
+  const calendar = [reelEntry];
+  const result = await runScheduledPost({ date: "2026-09-16", calendar, dryRun: true });
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, "dry_run");
+  assert.match(result.imagePath, /\.mp4$/);
+  assert.equal(fetchMock.mock.callCount(), 0);
+});
+
+test("runScheduledPost does not publish a reel yet — it renders then skips with reason reel_unsupported", async (t) => {
+  const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
+  const calendar = [reelEntry];
+  const result = await runScheduledPost({
+    date: "2026-09-16",
+    calendar,
+    pageId: "PAGE",
+    accessToken: "TOKEN",
+  });
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, "reel_unsupported");
+  assert.match(result.imagePath, /\.mp4$/);
+  assert.equal(fetchMock.mock.callCount(), 0);
+});
+
 test("re-running the same day skips the already-posted entry without a duplicate Facebook call", async (t) => {
   const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
   const calendarPath = await makeCalendarFile([draftTextEntry]);

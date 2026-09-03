@@ -119,13 +119,21 @@ export async function runScheduledPost({
 
   const imagePath = await renderPostImage(post);
   if (imagePath) {
-    console.log(`Rendered image: ${imagePath}`);
+    console.log(`Rendered ${post.format === "reel" ? "video" : "image"}: ${imagePath}`);
   }
 
   if (dryRun) {
     console.log("--dry-run enabled: skipping Facebook API call.");
     console.log(`Caption:\n${post.caption}`);
     return { skipped: true, reason: "dry_run", date: targetDate, post, imagePath };
+  }
+
+  if (post.format === "reel") {
+    console.warn(
+      `⚠️  Reel for ${targetDate} was rendered (${imagePath}) but is NOT auto-published — ` +
+        `posting Reels via the Graph API is not implemented yet (see #18). Upload it manually.`
+    );
+    return { skipped: true, reason: "reel_unsupported", date: targetDate, post, imagePath };
   }
 
   if (!pageId || !accessToken) {
