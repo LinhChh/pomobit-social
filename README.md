@@ -11,20 +11,25 @@ placeholder content.
 
 - `content/calendar.json` is the single source of truth for the schedule. Each
   entry has a `date`, `pillar`, `format` (`infographic` / `quote_card` / `text` /
-  `video` / `photo_text`), a `caption`, and a `status`:
+  `video` / `photo_text`), a `caption`, and a `status`. `text` entries may also
+  carry a short `cardText` — the line rendered on the image (the full `caption`
+  still goes out as the post text); without it the caption is used.
+  Statuses:
   - `draft` — ready to auto-post.
   - `manual_needed` — needs a real video, must be posted by hand.
   - `needs_review` — needs real data/photo filled in before it can post.
   - `posted` — already published; skipped. Set automatically after a successful
     post (and committed back to `content/calendar.json`), so a delayed or retried
     workflow run the same day never double-posts.
-- `src/renderImage.js` renders 1080x1080 PNGs for `infographic` and `quote_card`
-  posts using `@napi-rs/canvas`, with fonts bundled in `assets/fonts/` so
-  rendering doesn't depend on fonts installed on the CI machine.
+- `src/renderImage.js` renders 1080x1080 PNGs for `infographic`, `quote_card`, and
+  `text` posts using `@napi-rs/canvas`, with fonts bundled in `assets/fonts/` so
+  rendering doesn't depend on fonts installed on the CI machine. Only `video` and
+  `photo_text` (which carry manually-produced media) skip rendering.
 - `src/postToFacebook.js` finds today's post (Vietnam time, or `--date` override),
   skips anything `manual_needed`/`needs_review`/`posted` with a log line, calls the
-  Graph API (`POST /{page-id}/photos` when there's an image, `POST /{page-id}/feed`
-  for plain-text posts), then flips the entry to `posted` in the calendar file.
+  Graph API (`POST /{page-id}/photos` with the rendered image — `POST /{page-id}/feed`
+  is only a fallback for a format with no image), then flips the entry to `posted`
+  in the calendar file.
 - `.github/workflows/scheduled-post.yml` runs it on a cron schedule (primary +
   fallback), commits the `posted` status back to the repo, and can also be
   triggered manually with an optional `date` input.

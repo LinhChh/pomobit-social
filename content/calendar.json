@@ -24,6 +24,7 @@
     "pillar": "feature_demo",
     "format": "text",
     "status": "draft",
+    "cardText": "A focus timer and a habit tracker in one app.",
     "caption": "Pomobit in one sentence: a Pomodoro timer and a habit tracker in the same app. Pick a task, run one focused session, and it logs as a rep of the habit you're building. No feed, no badges, no 400 settings to configure first."
   },
   {
@@ -42,6 +43,7 @@
     "pillar": "engagement",
     "format": "text",
     "status": "draft",
+    "cardText": "What's the ONE habit you've been trying to build for months?",
     "caption": "What's the ONE habit you've been trying to build for months? Drop it below 👇"
   },
   {
@@ -98,6 +100,7 @@
     "pillar": "engagement",
     "format": "text",
     "status": "draft",
+    "cardText": "What time of day do you actually focus best?",
     "caption": "Quick one: what time of day do you actually focus best? Morning, late night, or that weird 2pm window nobody talks about? 👇"
   },
   {
