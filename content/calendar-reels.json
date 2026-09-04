@@ -1,0 +1,15 @@
+[
+  {
+    "date": "2026-09-28",
+    "week": 5,
+    "pillar": "feature_demo",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "One task.", "durationSec": 2.5 },
+      { "text": "One timer.", "durationSec": 2.5 },
+      { "text": "One rep of the habit you're building.", "durationSec": 4 }
+    ],
+    "caption": "Pomobit in one sentence: pick a task, run one focused session, and it logs as a rep of the habit you're building."
+  }
+]
