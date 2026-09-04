@@ -6,10 +6,22 @@ import { fileURLToPath } from "node:url";
 import { createCanvas } from "@napi-rs/canvas";
 import ffmpegStatic from "ffmpeg-static";
 import ffprobeStatic from "ffprobe-static";
-import { registerFonts, wrapText, drawWrappedText, COLORS, BRAND } from "./renderImage.js";
+import { registerFonts, wrapText, drawWrappedText, BRAND } from "./renderImage.js";
 
 const execFileP = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * Reel theme, sampled from the Pomobit app icon/wordmark (the blue tomato
+ * gradient + green leaf) rather than the cream/brown palette the static feed
+ * cards use — Reels get their own brand-blue look.
+ */
+export const REEL_COLORS = {
+  gradientTop: "#1596D6",
+  gradientBottom: "#052F5C",
+  text: "#FFFFFF",
+  accentGreen: "#3BAA6B",
+};
 
 /** Reels are shot 1080×1920 — the full-screen 9:16 frame Facebook/Instagram expect. */
 export const REEL_WIDTH = 1080;
@@ -19,7 +31,13 @@ export const REEL_HEIGHT = 1920;
 export const DEFAULT_DURATION_SEC = 10;
 const FPS = 30;
 
-export const DEFAULT_AUDIO = path.join(__dirname, "..", "assets", "audio", "bed.mp3");
+export const DEFAULT_AUDIO = path.join(
+  __dirname,
+  "..",
+  "assets",
+  "audio",
+  "lunarboommusic-guqin-melody-564700.mp3",
+);
 
 /** Returns the bare command name if it resolves on PATH, else null. */
 function commandOnPath(bin) {
@@ -55,15 +73,18 @@ export async function renderVerticalCard({ text, outPath, width = REEL_WIDTH, he
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = COLORS.background;
+  const bg = ctx.createLinearGradient(0, 0, width, height);
+  bg.addColorStop(0, REEL_COLORS.gradientTop);
+  bg.addColorStop(1, REEL_COLORS.gradientBottom);
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = REEL_COLORS.text;
   ctx.font = "600 40px 'Poppins SemiBold'";
   ctx.textAlign = "center";
   ctx.fillText(BRAND, width / 2, 150);
 
-  ctx.strokeStyle = COLORS.accentOrange;
+  ctx.strokeStyle = REEL_COLORS.accentGreen;
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(width / 2 - 54, 196);
@@ -87,7 +108,7 @@ export async function renderVerticalCard({ text, outPath, width = REEL_WIDTH, he
     lineHeight = Math.round(fontSize * 1.32);
   }
 
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = REEL_COLORS.text;
   ctx.font = `600 ${fontSize}px 'Poppins SemiBold'`;
   const startY = (topBound + bottomBound) / 2 - ((lines.length - 1) * lineHeight) / 2;
   drawWrappedText(ctx, text, { x: width / 2, y: startY, maxWidth: maxTextWidth, lineHeight });

@@ -27,3 +27,6 @@ node scripts/make-audio-bed.js
 | File | Source | Author | Licence |
 |------|--------|--------|---------|
 | `bed.mp3` | synthesized (`scripts/make-audio-bed.js`) | — | CC0 |
+| `lunarboommusic-guqin-melody-564700.mp3` | [pixabay.com/music/world-guqin-melody-564700](https://pixabay.com/music/world-guqin-melody-564700/) | LunarBoomMusic (AI-generated) | Pixabay Content License |
+| `lunarboommusic-bejing-harmony-564703.mp3` | [pixabay.com/music/world-bejing-harmony-564703](https://pixabay.com/music/world-bejing-harmony-564703/) | LunarBoomMusic (AI-generated) | Pixabay Content License |
+| `vitalsource-happy-china-545018.mp3` | [pixabay.com/music/world-happy-china-545018](https://pixabay.com/music/world-happy-china-545018/) | VitalSource (Sudzin Vitalii, BMI-registered) | Pixabay Content License |
