@@ -12,8 +12,7 @@
     "dry-run": "node src/index.js --dry-run",
     "test": "node --test",
     "test:watch": "node --test --watch",
-    "reel:poc": "node scripts/reel-poc.js",
-    "audio:bed": "node scripts/make-audio-bed.js"
+    "reel:poc": "node scripts/reel-poc.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.122.0",

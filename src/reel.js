@@ -164,7 +164,10 @@ export function buildReelFfmpegArgs({
     "128k",
     "-af",
     `afade=t=in:st=0:d=0.5,afade=t=out:st=${fadeOutStart}:d=1`,
-    "-shortest",
+    // No -shortest: combined with -loop 1 image input + a real (multi-minute)
+    // audio file it made ffmpeg mux zero audio bytes despite -t bounding the
+    // output correctly on its own — reproduced with all three real Pixabay
+    // tracks, not just a fluke.
     outPath,
   ];
 }
@@ -253,7 +256,7 @@ export function buildReelScriptFfmpegArgs({
     "aac",
     "-b:a",
     "128k",
-    "-shortest",
+    // No -shortest — see the note in buildReelFfmpegArgs.
     outPath,
   ];
 }

@@ -17,7 +17,9 @@ import {
 } from "../src/reel.js";
 
 const execFileP = promisify(execFile);
-const AUDIO_BED = fileURLToPath(new URL("../assets/audio/bed.mp3", import.meta.url));
+const TEST_AUDIO_TRACK = fileURLToPath(
+  new URL("../assets/audio/lunarboommusic-guqin-melody-564700.mp3", import.meta.url),
+);
 
 async function tempOut(name) {
   const dir = await mkdtemp(join(tmpdir(), "pomobit-reel-"));
@@ -55,7 +57,7 @@ test("buildReelFfmpegArgs defaults to a 10s clip (inside the 8-12s window)", () 
   assert.equal(args.at(-1), "out.mp4", "output path is last arg");
 });
 
-test("buildReelFfmpegArgs wires a centred Ken Burns zoom + audio fades + -shortest", () => {
+test("buildReelFfmpegArgs wires a centred Ken Burns zoom + audio fades, without -shortest", () => {
   const args = buildReelFfmpegArgs({
     cardPath: "card.png",
     audioPath: "bed.mp3",
@@ -71,7 +73,10 @@ test("buildReelFfmpegArgs wires a centred Ken Burns zoom + audio fades + -shorte
   assert.match(af, /afade=t=in:st=0/);
   assert.match(af, /afade=t=out:st=11:d=1/); // fades out over the last second
 
-  assert.ok(args.includes("-shortest"));
+  // -shortest + a `-loop 1` image input + a real multi-minute audio track
+  // muxes zero audio bytes (reproduced against all 3 real Pixabay tracks) —
+  // -t alone already bounds the output correctly, so it must stay dropped.
+  assert.ok(!args.includes("-shortest"));
 });
 
 test("renderVerticalCard writes a non-empty 1080x1920 PNG", async () => {
@@ -145,7 +150,7 @@ test("buildReelScriptFfmpegArgs with multiple beats wires per-beat inputs, xfade
   const t = Number(args[args.indexOf("-t") + 1]);
   assert.ok(Math.abs(t - 8.2) < 0.01, `expected ~8.2s total, got ${t}`);
 
-  assert.ok(args.includes("-shortest"));
+  assert.ok(!args.includes("-shortest"));
   assert.equal(args.at(-1), "out.mp4");
 });
 
@@ -155,7 +160,7 @@ test("renderReel produces a 1080x1920 mp4 with one video and one audio stream", 
     text: "What's the ONE habit you've been trying to build?",
     outPath,
     durationSec: 2,
-    audioPath: AUDIO_BED,
+    audioPath: TEST_AUDIO_TRACK,
   });
   assert.equal(result, outPath);
   const info = await stat(outPath);
@@ -179,7 +184,7 @@ test("renderReel with a script renders multiple beats crossfaded into one clip",
       { text: "One timer.", durationSec: 1.5 },
     ],
     outPath,
-    audioPath: AUDIO_BED,
+    audioPath: TEST_AUDIO_TRACK,
   });
   assert.equal(result, outPath);
   const info = await stat(outPath);
@@ -201,7 +206,7 @@ test("renderReel with a single-beat script behaves like the plain single-card pa
   await renderReel({
     script: [{ text: "Just one beat.", durationSec: 2 }],
     outPath,
-    audioPath: AUDIO_BED,
+    audioPath: TEST_AUDIO_TRACK,
   });
   const info = await stat(outPath);
   assert.ok(info.size > 0);

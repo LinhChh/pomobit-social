@@ -5,6 +5,7 @@
     "pillar": "feature_demo",
     "format": "reel",
     "status": "needs_review",
+    "audio": "assets/audio/lunarboommusic-bejing-harmony-564703.mp3",
     "script": [
       { "text": "One task.", "durationSec": 2.5 },
       { "text": "One timer.", "durationSec": 2.5 },
