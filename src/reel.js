@@ -169,18 +169,129 @@ export function buildReelFfmpegArgs({
   ];
 }
 
+/** Default crossfade between two script beats — short enough to stay unnoticed. */
+export const DEFAULT_CROSSFADE_SEC = 0.4;
+
+/** Builds one beat's per-input filter: upscale, Ken Burns zoom trimmed to its own duration, format. */
+function buildBeatFilter(index, durationSec, fps) {
+  const frames = Math.round(durationSec * fps);
+  return [
+    `[${index}:v]scale=2160:3840`,
+    `zoompan=z='min(zoom+0.0004,1.15)':d=${frames}:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=${REEL_WIDTH}x${REEL_HEIGHT}:fps=${fps}`,
+    "format=yuv420p",
+    `setsar=1[v${index}]`,
+  ].join(",");
+}
+
 /**
- * Renders a Ken Burns MVP Reel: one 1080×1920 text card, a slow zoom/pan, and a
- * royalty-free music bed faded in/out — all in a single ffmpeg pass (no JS frame
- * loop, so it is cheap enough for GitHub Actions).
+ * Builds the argv for a multi-beat Reel: one still per script beat, each with
+ * its own Ken Burns zoom sized to its `durationSec`, crossfaded together with
+ * `xfade`, under one continuous music bed. A single beat just delegates to
+ * `buildReelFfmpegArgs` — no transition needed.
+ */
+export function buildReelScriptFfmpegArgs({
+  beats,
+  audioPath,
+  outPath,
+  fps = FPS,
+  crossfadeSec = DEFAULT_CROSSFADE_SEC,
+}) {
+  if (beats.length === 1) {
+    return buildReelFfmpegArgs({
+      cardPath: beats[0].cardPath,
+      audioPath,
+      outPath,
+      durationSec: beats[0].durationSec,
+      fps,
+    });
+  }
+
+  const totalDurationSec =
+    beats.reduce((sum, beat) => sum + beat.durationSec, 0) - crossfadeSec * (beats.length - 1);
+  const fadeOutStart = Math.max(0, totalDurationSec - 1);
+  const audioInputIndex = beats.length;
+
+  const inputArgs = beats.flatMap((beat) => ["-loop", "1", "-i", beat.cardPath]);
+  const perBeatFilters = beats.map((beat, i) => buildBeatFilter(i, beat.durationSec, fps));
+
+  const xfadeFilters = [];
+  let cumulative = beats[0].durationSec;
+  let prevLabel = "v0";
+  for (let i = 1; i < beats.length; i++) {
+    const offset = cumulative - crossfadeSec;
+    const outLabel = i === beats.length - 1 ? "vout" : `vx${i}`;
+    xfadeFilters.push(
+      `[${prevLabel}][v${i}]xfade=transition=fade:duration=${crossfadeSec}:offset=${offset.toFixed(3)}[${outLabel}]`,
+    );
+    cumulative = cumulative + beats[i].durationSec - crossfadeSec;
+    prevLabel = outLabel;
+  }
+
+  const audioFilter = `[${audioInputIndex}:a]afade=t=in:st=0:d=0.5,afade=t=out:st=${fadeOutStart.toFixed(3)}:d=1[aout]`;
+  const filterComplex = [...perBeatFilters, ...xfadeFilters, audioFilter].join(";");
+
+  return [
+    "-y",
+    ...inputArgs,
+    "-i",
+    audioPath,
+    "-filter_complex",
+    filterComplex,
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-t",
+    totalDurationSec.toFixed(3),
+    "-c:v",
+    "libx264",
+    "-preset",
+    "veryfast",
+    "-r",
+    String(fps),
+    "-c:a",
+    "aac",
+    "-b:a",
+    "128k",
+    "-shortest",
+    outPath,
+  ];
+}
+
+/**
+ * Renders a Ken Burns MVP Reel. With plain `text`, it's one 1080×1920 card, a
+ * slow zoom/pan, and a royalty-free music bed faded in/out — all in a single
+ * ffmpeg pass (no JS frame loop, so it is cheap enough for GitHub Actions).
+ * With `script` (an array of `{ text, durationSec }` beats), it renders one
+ * card per beat and crossfades them together under the same music bed.
  */
 export async function renderReel({
   text,
+  script,
   outPath,
   durationSec = DEFAULT_DURATION_SEC,
   audioPath = DEFAULT_AUDIO,
 }) {
   await mkdir(path.dirname(outPath), { recursive: true });
+
+  if (script && script.length > 0) {
+    const beats = await Promise.all(
+      script.map(async (beat, i) => {
+        const cardPath = `${outPath}.beat${i}.png`;
+        await renderVerticalCard({ text: beat.text, outPath: cardPath });
+        return { cardPath, durationSec: beat.durationSec };
+      }),
+    );
+
+    const args = buildReelScriptFfmpegArgs({ beats, audioPath, outPath });
+    try {
+      await execFileP(resolveFfmpeg(), args, { maxBuffer: 1024 * 1024 * 32 });
+    } finally {
+      await Promise.all(beats.map((beat) => rm(beat.cardPath, { force: true })));
+    }
+    return outPath;
+  }
+
   const cardPath = `${outPath}.card.png`;
   await renderVerticalCard({ text, outPath: cardPath });
 

@@ -45,6 +45,21 @@ test("renderPostImage renders an mp4 (not a static image) for format 'reel'", as
   assert.ok(info.size > 0);
 });
 
+test("renderPostImage renders a multi-beat mp4 for format 'reel' with a script", async () => {
+  const mediaPath = await renderPostImage({
+    date: "2026-09-18",
+    format: "reel",
+    script: [
+      { text: "One task.", durationSec: 1.5 },
+      { text: "One timer.", durationSec: 1.5 },
+    ],
+  });
+  assert.ok(mediaPath);
+  assert.match(mediaPath, /2026-09-18\.mp4$/);
+  const info = await stat(mediaPath);
+  assert.ok(info.size > 0);
+});
+
 test("renderPostImage still returns null for video and photo_text", async () => {
   assert.equal(await renderPostImage({ date: "2026-09-04", format: "video" }), null);
   assert.equal(await renderPostImage({ date: "2026-09-11", format: "photo_text" }), null);

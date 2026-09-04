@@ -214,6 +214,7 @@ export async function renderPostImage(post) {
     case "reel":
       return renderReel({
         text: post.cardText ?? post.quoteText ?? post.caption,
+        script: post.script,
         outPath: path.join(OUTPUT_DIR, `${post.date}.mp4`),
         durationSec: post.durationSec,
         audioPath: post.audio
