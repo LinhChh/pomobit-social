@@ -1,5 +1,135 @@
 [
   {
+    "date": "2026-09-07",
+    "week": 2,
+    "pillar": "educational_hook",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "You're not lazy.", "durationSec": 2.5 },
+      { "text": "You're just decision-fatigued.", "durationSec": 3.3 },
+      { "text": "Fewer choices. More focus.", "durationSec": 3.2 }
+    ],
+    "caption": "You're not lazy, you're decision-fatigued. Every open tab and unsorted task is one more decision your brain has to make before it can focus on anything. Pomobit cuts that down to one: pick a task, start the timer."
+  },
+  {
+    "date": "2026-09-08",
+    "week": 2,
+    "pillar": "relatable",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Open the app to focus.", "durationSec": 2.8 },
+      { "text": "Scroll for 'inspiration' instead.", "durationSec": 3.4 },
+      { "text": "Sound familiar?", "durationSec": 2.8 }
+    ],
+    "caption": "Open the app to focus, end up scrolling for 'inspiration' instead. Sound familiar? The tool isn't the problem, the lack of a starting ritual is. Pomobit gives you one: pick, start, focus."
+  },
+  {
+    "date": "2026-09-09",
+    "week": 2,
+    "pillar": "feature_demo",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Pick one task.", "durationSec": 2.2 },
+      { "text": "Run one timer.", "durationSec": 2.2 },
+      { "text": "Log one rep of the habit you're building.", "durationSec": 4.4 }
+    ],
+    "caption": "Pomobit in three steps: pick one task, run one focused session, log one rep of the habit you're building. That's the whole app."
+  },
+  {
+    "date": "2026-09-10",
+    "week": 2,
+    "pillar": "engagement",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "How many tabs", "durationSec": 2.8 },
+      { "text": "are open right now?", "durationSec": 3.2 },
+      { "text": "Be honest. 👇", "durationSec": 3.0 }
+    ],
+    "caption": "How many tabs are open right now? Be honest 👇 — that number is basically a decision-fatigue score."
+  },
+  {
+    "date": "2026-09-11",
+    "week": 2,
+    "pillar": "behind_the_scenes",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "I built Pomobit", "durationSec": 2.4 },
+      { "text": "because timers alone weren't enough.", "durationSec": 3.8 },
+      { "text": "Every session should count for something.", "durationSec": 4.0 }
+    ],
+    "caption": "I built Pomobit because timers alone weren't enough for me. I needed every session to count for something, not just count down. So each focused block logs as a rep of the habit I'm actually trying to build."
+  },
+  {
+    "date": "2026-09-14",
+    "week": 3,
+    "pillar": "educational_hook",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Don't wait for the perfect setup.", "durationSec": 3.4 },
+      { "text": "Just press start.", "durationSec": 2.4 },
+      { "text": "Momentum shows up after, not before.", "durationSec": 3.8 }
+    ],
+    "caption": "Don't wait for the perfect setup, just press start. Momentum shows up after you begin, not before — Pomobit is built to make starting the easy part."
+  },
+  {
+    "date": "2026-09-15",
+    "week": 3,
+    "pillar": "relatable",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Busy isn't the same as productive.", "durationSec": 3.6 },
+      { "text": "One real session", "durationSec": 2.4 },
+      { "text": "beats ten fake ones.", "durationSec": 3.0 }
+    ],
+    "caption": "Busy isn't the same as productive. One real focused session beats ten fake ones spent half-working with five tabs open."
+  },
+  {
+    "date": "2026-09-16",
+    "week": 3,
+    "pillar": "feature_demo",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Every Pomodoro", "durationSec": 2.6 },
+      { "text": "becomes a rep.", "durationSec": 2.6 },
+      { "text": "Every rep becomes a habit.", "durationSec": 3.6 }
+    ],
+    "caption": "Every Pomodoro becomes a rep. Every rep becomes a habit. That's the loop Pomobit is built around."
+  },
+  {
+    "date": "2026-09-17",
+    "week": 3,
+    "pillar": "engagement",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "Morning person?", "durationSec": 2.8 },
+      { "text": "Night owl?", "durationSec": 2.6 },
+      { "text": "Or that weird 2pm window?", "durationSec": 3.8 }
+    ],
+    "caption": "Morning person, night owl, or that weird 2pm window nobody talks about? Drop your best focus time below 👇"
+  },
+  {
+    "date": "2026-09-18",
+    "week": 3,
+    "pillar": "feature_demo",
+    "format": "reel",
+    "status": "needs_review",
+    "script": [
+      { "text": "No feed. No badges.", "durationSec": 2.6 },
+      { "text": "No 400 settings to configure.", "durationSec": 3.4 },
+      { "text": "Just one focused session at a time.", "durationSec": 3.6 }
+    ],
+    "caption": "No feed, no badges, no 400 settings to configure first. Pomobit is a Pomodoro timer and a habit tracker in one app — just one focused session at a time."
+  },
+  {
     "date": "2026-09-28",
     "week": 5,
     "pillar": "feature_demo",
