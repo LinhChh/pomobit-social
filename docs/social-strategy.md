@@ -48,12 +48,21 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
   bài carousel mới nhất (đăng qua `/feed` + `attached_media`, không phải
   `/photos` đơn thuần như trước) — vẫn bị y hệt, nên **không phải do endpoint
   `/photos` vs `/feed`**, cũng không phải do tài khoản admin xem khác tài khoản
-  thường. Giả thuyết "cache của New Pages Experience + khoảng trống 7 tháng"
-  trước đây (mở permalink trực tiếp thì bài vẫn hiện) có thể chỉ là một phần
-  nguyên nhân — bài carousel này đăng **sau khi automation đã chạy đều đặn**
-  (không còn khoảng trống 7 tháng), nếu vẫn bị thì nghi ngờ đây là hành vi mặc
-  định của New Pages Experience với Page có ít tương tác/follower thật, không
-  đơn thuần là cache tạm thời. Cần điều tra thêm — xem mục 6.
+  thường.
+- **[ROOT CAUSE — nhiều khả năng nhất, 2026-09-05]** App Facebook "Pomobit"
+  (app id `1605781400878957`) nhiều khả năng chưa hoàn tất **App Review**
+  (Advanced Access cho `pages_manage_posts`) và **Business Verification**.
+  Bằng chứng: `GET /{page-id}/feed` bằng chính access token đang dùng bị từ
+  chối với lỗi `"requires the 'pages_read_engagement' permission or the 'Page
+  Public Content Access' feature"` — dù token đã có scope `pages_read_engagement`
+  (xem `debug_token`), nghĩa là thiếu 1 **Feature cấp app** cần App Review riêng,
+  khác với permission scope user cấp lúc OAuth. Theo policy Meta, app publish
+  qua API mà chưa qua review thì nội dung publish ra **chỉ hiển thị đầy đủ cho
+  Admin/Developer/Tester của chính app đó** — khớp chính xác với việc bạn (vừa
+  admin Page vừa admin app) thấy bình thường, còn acc test khác thì không.
+  → **Đây không phải bug trong code repo này** — API gọi đúng, payload đúng
+  (đã verify `status_type: "added_photos"`, `is_published: true`, đúng 3 ảnh
+  trong `attachments`). Fix nằm ở cấu hình app trên Meta, xem mục 6.
 - **Page recommendation status: "Recommendable"** — "Your Page is now in lists
   where we suggest Pages to new people." → **Page KHÔNG bị flag**, không có án
   phạt phân phối. Đủ điều kiện được FB gợi ý tới người lạ.
@@ -215,7 +224,7 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 | Vấn đề | Cần quyết |
 |---|---|
 | ~~Page bị FB quality-flag?~~ | ✅ **Đã xác minh: KHÔNG.** Page recommendation status = "Recommendable". Bỏ nhánh "lập Page mới" trừ khi Reels test cũng chết bất thường _và_ status đổi |
-| **Bài đăng qua API không hiện trên wall khi xem bằng acc không phải admin** | ⚠️ **Confirmed 2026-09-05**, chưa rõ nguyên nhân gốc (không phải endpoint `/photos` vs `/feed`, không phải chỉ do admin session). Cần thử: đăng 1 bài **thủ công qua Meta Business Suite** (không qua API) rồi so sánh cùng cách xem bằng acc khác — nếu vẫn không hiện thì đây là vấn đề của Page (follower chết/reach thấp làm FB không phát tán), không phải vấn đề riêng của việc đăng qua API |
+| **Bài đăng qua API không hiện trên wall khi xem bằng acc không phải admin** | 🔴 **Root cause xác định 2026-09-05**: app "Pomobit" (`1605781400878957`) chưa qua App Review (`pages_manage_posts` Advanced Access) + Business Verification — Meta giới hạn nội dung publish qua app chưa review chỉ hiển thị cho admin/tester của app. **Fix**: developers.facebook.com/apps/1605781400878957 → App Review → Permissions and Features → `pages_manage_posts` → Request Advanced Access; + Settings → Business Verification cho Business Portfolio `782672734830507`. Việc này ngoài phạm vi repo/code, cần chủ động làm trên Meta Dashboard |
 | Prune follower fake hay bỏ qua | Quyết sau khi thử remove ~20 account xem có dễ không |
 | Ngân sách ads | Nếu có: $3–5 boost cho **1 Reel đã chứng minh tốt**, target VN/English + productivity, để seed ~30–60 follower thật |
 | Nhạc cho video | Chọn 1 track CC0, ghi license trong `assets/audio/` (Issue #17) |
@@ -230,9 +239,12 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 - [x] Kiểm tra bằng acc Facebook khác (không phải admin) — **confirmed**: bài
       đăng qua API không hiện trên wall/feed, chỉ hiện ở "Photos" (2026-09-05,
       xem mục 1 & 6). Không phải chỉ là cache tạm thời như giả thuyết ban đầu.
-- [ ] Đăng thử 1 bài **thủ công qua Meta Business Suite** (không qua API), so
-      sánh cùng acc test — xác định đây là vấn đề Page (reach/follower) hay
-      vấn đề riêng của đường đăng qua API
+- [x] Tìm root cause qua Graph API (`debug_token`, `GET /{page-id}/feed`,
+      `GET /{post-id}/attachments`) — **app chưa qua App Review + Business
+      Verification** (2026-09-05, xem mục 1 & 6). Không phải lỗi code.
+- [ ] **[Blocking — cần bạn làm trên Meta Dashboard]** App Review cho
+      `pages_manage_posts` (Advanced Access) + Business Verification —
+      developers.facebook.com/apps/1605781400878957
 - [ ] Soạn ~15 câu one-liner/hook cho Reels → thêm entry `format: "reel"` vào `calendar.json`
 
 **Build (~1 tuần):**
