@@ -1,6 +1,6 @@
 # Chiến lược xây dựng social cho Pomobit — Tình hình & Kế hoạch
 
-_Cập nhật: 2026-09-03 (rev. 2 — chốt hướng Ken Burns MVP)_
+_Cập nhật: 2026-09-05 (rev. 4 — fixed: app đã qua App Review, bài đăng qua API hiện đúng cho người dùng khác)_
 
 Tài liệu này chốt lại hiện trạng kênh Facebook của Pomobit, chẩn đoán vì sao
 reach đang gần bằng 0, và định hướng đi tiếp. Nguồn dữ liệu: Meta Business Suite,
@@ -42,10 +42,29 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
 ### Đã xác minh
 - **Graph API**: cả 2 bài tháng 9 `is_published: true`, `is_hidden: false`,
   `privacy: EVERYONE`. Bài đăng đúng, công khai, không bị ẩn — không phải lỗi code.
-- Việc không thấy bài trong tab "Posts" (kể cả tài khoản admin) là do
-  **cache của New Pages Experience** + khoảng trống 7 tháng làm feed module kẹt
-  anchor. Grid "Photos" update nhanh hơn nên chỉ thấy ảnh. Mở permalink trực tiếp
-  thì bài hiện bình thường.
+- **[CONFIRMED 2026-09-05, không còn là giả thuyết]** Bài đăng qua API **không
+  hiện trên wall/feed khi xem bằng tài khoản Facebook khác (không phải admin)**
+  — chỉ hiện trong tab "Photos", không hiện ở "Posts"/timeline chính. Test bằng
+  bài carousel mới nhất (đăng qua `/feed` + `attached_media`, không phải
+  `/photos` đơn thuần như trước) — vẫn bị y hệt, nên **không phải do endpoint
+  `/photos` vs `/feed`**, cũng không phải do tài khoản admin xem khác tài khoản
+  thường.
+- **[ROOT CAUSE — RESOLVED 2026-09-05]** App Facebook "Pomobit"
+  (app id `1605781400878957`) chưa hoàn tất **App Review** (Advanced Access
+  cho `pages_manage_posts`) và **Business Verification**. Bằng chứng: `GET
+  /{page-id}/feed` bằng chính access token đang dùng bị từ chối với lỗi
+  `"requires the 'pages_read_engagement' permission or the 'Page Public
+  Content Access' feature"` — dù token đã có scope `pages_read_engagement`
+  (xem `debug_token`), nghĩa là thiếu 1 **Feature cấp app** cần App Review
+  riêng, khác với permission scope user cấp lúc OAuth. Theo policy Meta, app
+  publish qua API mà chưa qua review thì nội dung publish ra **chỉ hiển thị
+  đầy đủ cho Admin/Developer/Tester của chính app đó** — khớp chính xác với
+  việc bạn (vừa admin Page vừa admin app) thấy bình thường, còn acc test khác
+  thì không. **Đây không phải bug trong code repo này** — API gọi đúng,
+  payload đúng (đã verify `status_type: "added_photos"`, `is_published:
+  true`, đúng 3 ảnh trong `attachments`).
+  ✅ **Đã publish app trên Meta Dashboard — xác nhận bài đăng qua API giờ
+  hiện đúng cho người dùng khác, không chỉ admin.** Vòng điều tra này đóng.
 - **Page recommendation status: "Recommendable"** — "Your Page is now in lists
   where we suggest Pages to new people." → **Page KHÔNG bị flag**, không có án
   phạt phân phối. Đủ điều kiện được FB gợi ý tới người lạ.
@@ -207,6 +226,7 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 | Vấn đề | Cần quyết |
 |---|---|
 | ~~Page bị FB quality-flag?~~ | ✅ **Đã xác minh: KHÔNG.** Page recommendation status = "Recommendable". Bỏ nhánh "lập Page mới" trừ khi Reels test cũng chết bất thường _và_ status đổi |
+| ~~Bài đăng qua API không hiện trên wall khi xem bằng acc không phải admin~~ | ✅ **Đã fix 2026-09-05.** Root cause: app "Pomobit" (`1605781400878957`) chưa qua App Review (`pages_manage_posts` Advanced Access) + Business Verification. Đã publish app trên Meta Dashboard — xác nhận bài đăng qua API giờ hiện đúng cho acc không phải admin |
 | Prune follower fake hay bỏ qua | Quyết sau khi thử remove ~20 account xem có dễ không |
 | Ngân sách ads | Nếu có: $3–5 boost cho **1 Reel đã chứng minh tốt**, target VN/English + productivity, để seed ~30–60 follower thật |
 | Nhạc cho video | Chọn 1 track CC0, ghi license trong `assets/audio/` (Issue #17) |
@@ -218,7 +238,15 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 ## 7. Next actions
 
 **Trước khi build:**
-- [ ] Kiểm tra tab "Posts" bằng incognito/mobile để xác nhận chỉ là cache
+- [x] Kiểm tra bằng acc Facebook khác (không phải admin) — **confirmed**: bài
+      đăng qua API không hiện trên wall/feed, chỉ hiện ở "Photos" (2026-09-05,
+      xem mục 1 & 6). Không phải chỉ là cache tạm thời như giả thuyết ban đầu.
+- [x] Tìm root cause qua Graph API (`debug_token`, `GET /{page-id}/feed`,
+      `GET /{post-id}/attachments`) — **app chưa qua App Review + Business
+      Verification** (2026-09-05, xem mục 1 & 6). Không phải lỗi code.
+- [x] App Review cho `pages_manage_posts` (Advanced Access) + Business
+      Verification — **done 2026-09-05**, app đã publish, bài đăng qua API
+      giờ hiện đúng cho acc không phải admin
 - [ ] Soạn ~15 câu one-liner/hook cho Reels → thêm entry `format: "reel"` vào `calendar.json`
 
 **Build (~1 tuần):**
