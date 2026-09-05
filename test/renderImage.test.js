@@ -3,11 +3,14 @@ import assert from "node:assert/strict";
 import { mkdtemp, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { renderTextCard, renderPostImage, textCardContent } from "../src/renderImage.js";
+import { renderTextCard, renderCarouselImages, renderPostImage, textCardContent } from "../src/renderImage.js";
+
+async function tempDir() {
+  return mkdtemp(join(tmpdir(), "pomobit-img-"));
+}
 
 async function tempOut(name = "card.png") {
-  const dir = await mkdtemp(join(tmpdir(), "pomobit-img-"));
-  return join(dir, name);
+  return join(await tempDir(), name);
 }
 
 test("renderTextCard writes a non-empty PNG to the given path", async () => {
@@ -66,5 +69,45 @@ test("renderPostImage still returns null for video and photo_text", async () => 
 });
 
 test("renderPostImage throws for an unknown format", async () => {
-  await assert.rejects(renderPostImage({ date: "2026-09-04", format: "carousel" }));
+  await assert.rejects(renderPostImage({ date: "2026-09-04", format: "mystery_format" }));
+});
+
+test("renderCarouselImages renders one PNG per slide, named <prefix>-1.png.. in order", async () => {
+  const outPathPrefix = join(await tempDir(), "2026-09-28");
+  const slides = [{ text: "Step one." }, { text: "Step two." }, { text: "Step three." }];
+
+  const paths = await renderCarouselImages({ slides, outPathPrefix });
+
+  assert.deepEqual(paths, [
+    `${outPathPrefix}-1.png`,
+    `${outPathPrefix}-2.png`,
+    `${outPathPrefix}-3.png`,
+  ]);
+  for (const p of paths) {
+    const info = await stat(p);
+    assert.ok(info.size > 0);
+  }
+});
+
+test("renderCarouselImages throws when there are fewer than 2 or more than 5 slides", async () => {
+  const outPathPrefix = join(await tempDir(), "2026-09-28");
+  await assert.rejects(renderCarouselImages({ slides: [{ text: "Only one." }], outPathPrefix }));
+  await assert.rejects(
+    renderCarouselImages({
+      slides: Array.from({ length: 6 }, (_, i) => ({ text: `Slide ${i + 1}` })),
+      outPathPrefix,
+    })
+  );
+});
+
+test("renderPostImage renders an array of PNGs for format 'carousel'", async () => {
+  const paths = await renderPostImage({
+    date: "2026-09-28",
+    format: "carousel",
+    slides: [{ text: "Step one." }, { text: "Step two." }],
+  });
+  assert.ok(Array.isArray(paths));
+  assert.equal(paths.length, 2);
+  assert.match(paths[0], /2026-09-28-1\.png$/);
+  assert.match(paths[1], /2026-09-28-2\.png$/);
 });

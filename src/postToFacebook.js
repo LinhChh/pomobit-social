@@ -59,6 +59,53 @@ async function postPhoto({ pageId, accessToken, imagePath, caption }) {
   return body;
 }
 
+async function postUnpublishedPhoto({ pageId, accessToken, imagePath }) {
+  const imageBuffer = await readFile(imagePath);
+  const form = new FormData();
+  form.append("source", new Blob([imageBuffer], { type: "image/png" }), path.basename(imagePath));
+  form.append("published", "false");
+  form.append("access_token", accessToken);
+
+  const response = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${pageId}/photos`, {
+    method: "POST",
+    body: form,
+  });
+
+  const body = await response.json();
+  if (!response.ok) {
+    throw new Error(`Facebook Graph API error (photos, unpublished): ${JSON.stringify(body)}`);
+  }
+  return body.id;
+}
+
+/**
+ * Publishes a multi-photo post: each image is uploaded unpublished first
+ * (so it doesn't appear as its own feed post), then a single feed post
+ * references all of them via `attached_media`.
+ */
+async function postCarousel({ pageId, accessToken, imagePaths, caption }) {
+  const photoIds = [];
+  for (const imagePath of imagePaths) {
+    photoIds.push(await postUnpublishedPhoto({ pageId, accessToken, imagePath }));
+  }
+
+  const params = new URLSearchParams({ message: caption, access_token: accessToken });
+  photoIds.forEach((id, i) => {
+    params.append(`attached_media[${i}]`, JSON.stringify({ media_fbid: id }));
+  });
+
+  const response = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${pageId}/feed`, {
+    method: "POST",
+    body: params,
+  });
+
+  const body = await response.json();
+  if (!response.ok) {
+    throw new Error(`Facebook Graph API error (feed, carousel): ${JSON.stringify(body)}`);
+  }
+  return body;
+}
+
 async function postFeedMessage({ pageId, accessToken, message }) {
   const params = new URLSearchParams({ message, access_token: accessToken });
 
@@ -119,7 +166,8 @@ export async function runScheduledPost({
 
   const imagePath = await renderPostImage(post);
   if (imagePath) {
-    console.log(`Rendered ${post.format === "reel" ? "video" : "image"}: ${imagePath}`);
+    const kind = post.format === "reel" ? "video" : Array.isArray(imagePath) ? "images" : "image";
+    console.log(`Rendered ${kind}: ${Array.isArray(imagePath) ? imagePath.join(", ") : imagePath}`);
   }
 
   if (dryRun) {
@@ -140,9 +188,11 @@ export async function runScheduledPost({
     throw new Error("FB_PAGE_ID and FB_PAGE_ACCESS_TOKEN are required to post (or use --dry-run).");
   }
 
-  const result = imagePath
-    ? await postPhoto({ pageId, accessToken, imagePath, caption: post.caption })
-    : await postFeedMessage({ pageId, accessToken, message: post.caption });
+  const result = Array.isArray(imagePath)
+    ? await postCarousel({ pageId, accessToken, imagePaths: imagePath, caption: post.caption })
+    : imagePath
+      ? await postPhoto({ pageId, accessToken, imagePath, caption: post.caption })
+      : await postFeedMessage({ pageId, accessToken, message: post.caption });
 
   console.log("Posted to Facebook:", result);
 
