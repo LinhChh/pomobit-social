@@ -1,5 +1,24 @@
 [
   {
+    "date": "2026-09-05",
+    "week": 1,
+    "pillar": "relatable",
+    "format": "carousel",
+    "status": "posted",
+    "slides": [
+      {
+        "text": "You open the app to focus."
+      },
+      {
+        "text": "Ten minutes later you're deep in your camera roll."
+      },
+      {
+        "text": "Pomobit fixes the start, not the willpower."
+      }
+    ],
+    "caption": "The problem usually isn't willpower, it's the first 10 seconds after you open the app. Pomobit skips the browsing: pick a task, hit start, you're in a focused session before the urge to scroll kicks in."
+  },
+  {
     "date": "2026-08-31",
     "week": 1,
     "pillar": "educational_hook",
@@ -119,9 +138,15 @@
     "format": "carousel",
     "status": "needs_review",
     "slides": [
-      { "text": "Most timers just count down." },
-      { "text": "Pomobit logs each session as a rep of the habit you're building." },
-      { "text": "One session. One habit. One win." }
+      {
+        "text": "Most timers just count down."
+      },
+      {
+        "text": "Pomobit logs each session as a rep of the habit you're building."
+      },
+      {
+        "text": "One session. One habit. One win."
+      }
     ],
     "caption": "A countdown by itself doesn't build anything. Pomobit ties every focused session to a habit, so finishing the timer actually means something."
   },
@@ -132,10 +157,18 @@
     "format": "carousel",
     "status": "needs_review",
     "slides": [
-      { "text": "Pick a task." },
-      { "text": "Run one focused session." },
-      { "text": "It logs as a rep of the habit it belongs to." },
-      { "text": "No feed, no badges, no setup." }
+      {
+        "text": "Pick a task."
+      },
+      {
+        "text": "Run one focused session."
+      },
+      {
+        "text": "It logs as a rep of the habit it belongs to."
+      },
+      {
+        "text": "No feed, no badges, no setup."
+      }
     ],
     "caption": "How a Pomobit session actually works, in 4 steps. Pick a task, run one focused block, and it logs against the habit you're building — that's the whole app."
   },
@@ -146,9 +179,15 @@
     "format": "carousel",
     "status": "needs_review",
     "slides": [
-      { "text": "A timer alone doesn't build a habit." },
-      { "text": "It just tells you when to stop." },
-      { "text": "What actually builds a habit is what the session counts toward." }
+      {
+        "text": "A timer alone doesn't build a habit."
+      },
+      {
+        "text": "It just tells you when to stop."
+      },
+      {
+        "text": "What actually builds a habit is what the session counts toward."
+      }
     ],
     "caption": "Why a timer alone doesn't build a habit — it just tells you when to stop. What actually builds the habit is what that session counts toward, which is the part most Pomodoro apps skip."
   }
