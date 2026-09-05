@@ -8,6 +8,23 @@ no database (Supabase or otherwise); `content/calendar.json` and
 `content/calendar-reels.json` are the only data stores.
 GitHub repo: `LinhChh/pomobit-social`
 
+## Branch strategy
+Hai tầng branch, tách biệt "đã merge" khỏi "đang live":
+- **`develop`** — working branch. Feature/fix branches (`feature/<NUMBER>-*`)
+  merge vào đây qua PR, không cần CI pass (xem TDD workflow bên dưới —
+  `npm test` chạy local trước khi merge).
+- **`main`** — production branch, và cũng là **default branch của repo**.
+  `scheduled-post.yml` (cron đăng bài thật lên Facebook Page) chạy theo
+  `schedule:` trigger, thứ này luôn bám theo default branch — nên nội dung
+  trong `content/calendar.json`/`calendar-reels.json` chỉ thật sự được cron
+  nhặt và đăng khi đã có mặt trên `main`, không phải ngay khi merge vào
+  `develop`.
+- Đưa `develop` lên `main`: mở PR `develop → main`
+  (`gh pr create --base main --head develop --title "..."`). `ci.yml` chỉ
+  chạy CI (`npm test`) trên push/PR nhắm vào `main` — đây là gate duy nhất
+  trước khi lên production, nên xác nhận `npm test` xanh trên `develop` trước
+  khi mở PR này.
+
 ## Test setup
 - Runner: Node's built-in `node:test` (no extra dependency needed for a project
   this size)

@@ -1,13 +1,15 @@
 name: CI
 
-# Runs the test suite on push to develop, on PRs against develop, or manually.
+# Gates promotion from develop into main (production — see #26): runs the
+# test suite on push/PR to main, or manually. develop itself has no CI gate —
+# feature branches merge there freely; main only moves via develop → main PRs.
 # Separate from the scheduled-post job so a render regression (especially the
 # ffmpeg Reel pipeline) is caught here, well before a cron run tries to publish.
 on:
   push:
-    branches: [develop]
+    branches: [main]
   pull_request:
-    branches: [develop]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
