@@ -1,0 +1,29 @@
+name: CI
+
+# Runs the test suite on push to develop, or manually. Separate from the
+# scheduled-post job so a render regression (especially the ffmpeg Reel
+# pipeline) is caught here, well before a cron run tries to publish.
+#
+# No `pull_request` trigger: the ffmpeg-in-CI step is currently broken
+# (ubuntu-latest no longer ships ffmpeg preinstalled — see #21), so it was
+# failing on every push to open PRs. Re-add `pull_request:` once that's fixed.
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # ubuntu-latest already ships ffmpeg/ffprobe; this is a belt-and-braces
+      # guard so resolveFfmpeg() finds a system binary and the Reel smoke test
+      # exercises the real CI code path.
+      - name: Ensure ffmpeg is available
+        run: ffmpeg -version && ffprobe -version
+      - run: npm ci
+      - run: npm test

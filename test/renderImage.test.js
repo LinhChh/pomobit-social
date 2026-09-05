@@ -31,6 +31,35 @@ test("textCardContent uses cardText when present, else falls back to caption", (
   assert.equal(textCardContent({ caption: "a much longer caption" }), "a much longer caption");
 });
 
+test("renderPostImage renders an mp4 (not a static image) for format 'reel'", async () => {
+  const mediaPath = await renderPostImage({
+    date: "2026-09-16",
+    format: "reel",
+    cardText: "One task. One timer.",
+    durationSec: 2,
+  });
+  assert.ok(mediaPath);
+  assert.match(mediaPath, /2026-09-16\.mp4$/);
+  assert.doesNotMatch(mediaPath, /\.png$/);
+  const info = await stat(mediaPath);
+  assert.ok(info.size > 0);
+});
+
+test("renderPostImage renders a multi-beat mp4 for format 'reel' with a script", async () => {
+  const mediaPath = await renderPostImage({
+    date: "2026-09-18",
+    format: "reel",
+    script: [
+      { text: "One task.", durationSec: 1.5 },
+      { text: "One timer.", durationSec: 1.5 },
+    ],
+  });
+  assert.ok(mediaPath);
+  assert.match(mediaPath, /2026-09-18\.mp4$/);
+  const info = await stat(mediaPath);
+  assert.ok(info.size > 0);
+});
+
 test("renderPostImage still returns null for video and photo_text", async () => {
   assert.equal(await renderPostImage({ date: "2026-09-04", format: "video" }), null);
   assert.equal(await renderPostImage({ date: "2026-09-11", format: "photo_text" }), null);

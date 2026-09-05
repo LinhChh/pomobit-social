@@ -2,15 +2,16 @@ import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderReel } from "./reel.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FONTS_DIR = path.join(__dirname, "..", "assets", "fonts");
 const OUTPUT_DIR = path.join(__dirname, "..", "output");
 
 const SIZE = 1080;
-const BRAND = "POMOBIT";
+export const BRAND = "POMOBIT";
 
-const COLORS = {
+export const COLORS = {
   background: "#f5ede0",
   darkBrown: "#3d2914",
   accentOrange: "#c45a3c",
@@ -18,7 +19,7 @@ const COLORS = {
 
 let fontsRegistered = false;
 
-function registerFonts() {
+export function registerFonts() {
   if (fontsRegistered) return;
   GlobalFonts.registerFromPath(path.join(FONTS_DIR, "Poppins-Regular.ttf"), "Poppins");
   GlobalFonts.registerFromPath(path.join(FONTS_DIR, "Poppins-SemiBold.ttf"), "Poppins SemiBold");
@@ -31,7 +32,7 @@ function registerFonts() {
  * Wraps text to fit within maxWidth, splitting on word boundaries.
  * Relies on canvas 2D's built-in measureText, no external dependency needed.
  */
-function wrapText(ctx, text, maxWidth) {
+export function wrapText(ctx, text, maxWidth) {
   const words = text.split(/\s+/).filter(Boolean);
   const lines = [];
   let currentLine = "";
@@ -49,7 +50,7 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-function drawWrappedText(ctx, text, { x, y, maxWidth, lineHeight, align = "center" }) {
+export function drawWrappedText(ctx, text, { x, y, maxWidth, lineHeight, align = "center" }) {
   const lines = wrapText(ctx, text, maxWidth);
   ctx.textAlign = align;
   lines.forEach((line, i) => {
@@ -202,14 +203,24 @@ export function textCardContent(post) {
 }
 
 /**
- * Dispatches rendering based on post.format. Returns the output image path,
- * or null for the two formats that carry manually-produced media instead of a
- * rendered image (video/photo_text).
+ * Dispatches rendering based on post.format. Returns the output media path
+ * (a `.png` for the feed formats, a `.mp4` for `reel`), or null for the two
+ * formats that carry manually-produced media instead (video/photo_text).
  */
 export async function renderPostImage(post) {
   const outPath = path.join(OUTPUT_DIR, `${post.date}.png`);
 
   switch (post.format) {
+    case "reel":
+      return renderReel({
+        text: post.cardText ?? post.quoteText ?? post.caption,
+        script: post.script,
+        outPath: path.join(OUTPUT_DIR, `${post.date}.mp4`),
+        durationSec: post.durationSec,
+        audioPath: post.audio
+          ? path.join(__dirname, "..", post.audio)
+          : undefined,
+      });
     case "infographic":
       return renderInfographic({
         topText: post.topText,

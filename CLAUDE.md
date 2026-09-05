@@ -4,7 +4,8 @@
 Node.js 20+, ESM (`"type": "module"`), plain JavaScript. CLI script that renders
 post images (`@napi-rs/canvas`) and posts them to a Facebook Page via the Graph
 API. Runs on a GitHub Actions cron schedule — there is no Express/HTTP server and
-no database (Supabase or otherwise); `content/calendar.json` is the only data store.
+no database (Supabase or otherwise); `content/calendar.json` and
+`content/calendar-reels.json` are the only data stores.
 GitHub repo: `LinhChh/pomobit-social`
 
 ## Test setup
@@ -82,6 +83,7 @@ gh issue comment <NUMBER> --body "" # comment thay đổi lên issue
 gh issue close <NUMBER>          # CHỈ chạy khi user yêu cầu close
 node --test test/renderImage.test.js  # chạy 1 file test
 node src/index.js --date 2026-08-31 --dry-run  # xem thử 1 post mà không gọi API thật
+node src/index.js --calendar content/calendar-reels.json --date 2026-09-28 --dry-run  # xem thử 1 reel
 ```
 
 ## Mocking conventions
@@ -106,9 +108,16 @@ node src/index.js --date 2026-08-31 --dry-run  # xem thử 1 post mà không g�
   cần mock `Date`.
 
 ## Key architectural notes
-- **`content/calendar.json` là single source of truth** cho lịch đăng bài. Mỗi
-  entry có `date`, `pillar`, `format` (`infographic` | `quote_card` | `text` |
-  `video` | `photo_text`), `caption`, và `status`.
+- **Hai file lịch đăng bài, tách theo kênh** — không có DB, cả hai đều là
+  single source of truth trong phạm vi của nó:
+  - `content/calendar.json` — **chỉ bài ảnh tĩnh (feed cold post)**: format
+    `infographic` | `quote_card` | `text` | `video` | `photo_text`.
+  - `content/calendar-reels.json` — **chỉ Reels** (`format: "reel"`), dùng
+    field `script: [{ text, durationSec }]` cho kịch bản nhiều đoạn (xem
+    `src/reel.js`). Chạy qua cùng `runScheduledPost`/`renderPostImage`, chỉ
+    khác `calendarPath` truyền vào (CLI: `node src/index.js --calendar
+    content/calendar-reels.json`).
+  - Mỗi entry đều có `date`, `pillar`, `format`, `caption`, và `status`.
 - **`status`**: `"draft"` (sẵn sàng đăng tự động) | `"manual_needed"` (cần quay
   video, đăng tay) | `"needs_review"` (cần điền số liệu/ảnh thật trước khi đăng) |
   `"posted"` (đã đăng rồi — `runScheduledPost` tự set + commit lại vào
