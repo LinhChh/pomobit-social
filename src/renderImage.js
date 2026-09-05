@@ -11,10 +11,16 @@ const OUTPUT_DIR = path.join(__dirname, "..", "output");
 const SIZE = 1080;
 export const BRAND = "POMOBIT";
 
+/**
+ * Sampled from the Pomobit app logo — navy wordmark + green leaf on a white
+ * ground — rather than the reel's dark blue gradient (REEL_COLORS in
+ * reel.js): these cards sit in a light Facebook feed, not a full-screen 9:16
+ * frame, so a light background reads better here.
+ */
 export const COLORS = {
-  background: "#f5ede0",
-  darkBrown: "#3d2914",
-  accentOrange: "#c45a3c",
+  background: "#FFFFFF",
+  textPrimary: "#111828",
+  accent: "#309652",
 };
 
 let fontsRegistered = false;
@@ -84,13 +90,13 @@ export async function renderInfographic({ topText, bottomText, outPath }) {
   ctx.fillRect(0, 0, SIZE, SIZE);
 
   // Brand header
-  drawBrand(ctx, COLORS.darkBrown);
+  drawBrand(ctx, COLORS.textPrimary);
 
   const halfHeight = SIZE / 2;
   const maxTextWidth = SIZE - 160;
 
   // Top block: "NOT THE PROBLEM"
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = COLORS.textPrimary;
   ctx.font = "600 30px 'Poppins SemiBold'";
   ctx.textAlign = "center";
   ctx.fillText("NOT THE PROBLEM", SIZE / 2, halfHeight / 2 - 60);
@@ -104,7 +110,7 @@ export async function renderInfographic({ topText, bottomText, outPath }) {
   });
 
   // Divider line
-  ctx.strokeStyle = COLORS.darkBrown;
+  ctx.strokeStyle = COLORS.textPrimary;
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.moveTo(80, halfHeight);
@@ -112,7 +118,7 @@ export async function renderInfographic({ topText, bottomText, outPath }) {
   ctx.stroke();
 
   // Bottom block: "THE REAL ANSWER"
-  ctx.fillStyle = COLORS.accentOrange;
+  ctx.fillStyle = COLORS.accent;
   ctx.font = "600 30px 'Poppins SemiBold'";
   ctx.textAlign = "center";
   ctx.fillText("THE REAL ANSWER", SIZE / 2, halfHeight + halfHeight / 2 - 40);
@@ -136,12 +142,12 @@ export async function renderQuoteCard({ quoteText, outPath }) {
   ctx.fillStyle = COLORS.background;
   ctx.fillRect(0, 0, SIZE, SIZE);
 
-  ctx.fillStyle = COLORS.accentOrange;
+  ctx.fillStyle = COLORS.accent;
   ctx.font = "800 140px 'Poppins ExtraBold'";
   ctx.textAlign = "center";
   ctx.fillText("“", SIZE / 2, 260);
 
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = COLORS.textPrimary;
   ctx.font = "600 56px 'Poppins SemiBold'";
   const maxTextWidth = SIZE - 200;
   const lineHeight = 68;
@@ -155,7 +161,7 @@ export async function renderQuoteCard({ quoteText, outPath }) {
   });
 
   ctx.font = "600 28px 'Poppins SemiBold'";
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = COLORS.textPrimary;
   ctx.textAlign = "center";
   ctx.fillText(BRAND, SIZE / 2, SIZE - 70);
 
@@ -170,18 +176,18 @@ export async function renderTextCard({ text, outPath }) {
   ctx.fillStyle = COLORS.background;
   ctx.fillRect(0, 0, SIZE, SIZE);
 
-  drawBrand(ctx, COLORS.darkBrown);
+  drawBrand(ctx, COLORS.textPrimary);
 
   // Short accent rule under the brand — distinguishes this from the quote card,
   // which leads with a large quotation mark instead.
-  ctx.strokeStyle = COLORS.accentOrange;
+  ctx.strokeStyle = COLORS.accent;
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(SIZE / 2 - 44, 112);
   ctx.lineTo(SIZE / 2 + 44, 112);
   ctx.stroke();
 
-  ctx.fillStyle = COLORS.darkBrown;
+  ctx.fillStyle = COLORS.textPrimary;
   ctx.font = "600 60px 'Poppins SemiBold'";
   const maxTextWidth = SIZE - 200;
   const lineHeight = 78;

@@ -3,12 +3,59 @@ import assert from "node:assert/strict";
 import { mkdtemp, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { renderTextCard, renderPostImage, textCardContent } from "../src/renderImage.js";
+import { createCanvas, loadImage } from "@napi-rs/canvas";
+import {
+  COLORS,
+  renderInfographic,
+  renderQuoteCard,
+  renderTextCard,
+  renderPostImage,
+  textCardContent,
+} from "../src/renderImage.js";
 
 async function tempOut(name = "card.png") {
   const dir = await mkdtemp(join(tmpdir(), "pomobit-img-"));
   return join(dir, name);
 }
+
+/** Reads a single pixel's color out of a rendered PNG, as `#RRGGBB`. */
+async function readPixel(pngPath, x, y) {
+  const img = await loadImage(pngPath);
+  const canvas = createCanvas(img.width, img.height);
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0);
+  const [r, g, b] = ctx.getImageData(x, y, 1, 1).data;
+  return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+test("COLORS uses the Pomobit app palette (navy text, green accent, white background) instead of the old cream/brown theme", () => {
+  assert.equal(COLORS.background, "#FFFFFF");
+  assert.equal(COLORS.textPrimary, "#111828");
+  assert.equal(COLORS.accent, "#309652");
+});
+
+test("renderInfographic, renderQuoteCard, and renderTextCard share the same background color from COLORS", async () => {
+  const infographicPath = await tempOut("infographic.png");
+  await renderInfographic({ topText: "Willpower", bottomText: "Structure", outPath: infographicPath });
+
+  const quotePath = await tempOut("quote.png");
+  await renderQuoteCard({ quoteText: "Small steps compound.", outPath: quotePath });
+
+  const textPath = await tempOut("text.png");
+  await renderTextCard({ text: "What time of day do you focus best?", outPath: textPath });
+
+  // Corner pixel: no renderer draws anything there, so it's a solid read of
+  // the background fill with no anti-aliasing to account for.
+  const [infographicBg, quoteBg, textBg] = await Promise.all([
+    readPixel(infographicPath, 10, 10),
+    readPixel(quotePath, 10, 10),
+    readPixel(textPath, 10, 10),
+  ]);
+
+  assert.equal(infographicBg, COLORS.background);
+  assert.equal(quoteBg, COLORS.background);
+  assert.equal(textBg, COLORS.background);
+});
 
 test("renderTextCard writes a non-empty PNG to the given path", async () => {
   const outPath = await tempOut();
