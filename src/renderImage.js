@@ -197,6 +197,24 @@ export async function renderTextCard({ text, outPath }) {
   return writePng(canvas, outPath);
 }
 
+/**
+ * Renders a 2-5 slide carousel: one 1080×1080 PNG per slide, reusing the
+ * `renderTextCard` layout, named `<outPathPrefix>-1.png`.. in slide order.
+ */
+export async function renderCarouselImages({ slides, outPathPrefix }) {
+  if (!Array.isArray(slides) || slides.length < 2 || slides.length > 5) {
+    throw new Error(`Carousel format requires 2-5 slides, got ${slides?.length ?? 0}`);
+  }
+
+  const paths = [];
+  for (let i = 0; i < slides.length; i++) {
+    const outPath = `${outPathPrefix}-${i + 1}.png`;
+    await renderTextCard({ text: slides[i].text, outPath });
+    paths.push(outPath);
+  }
+  return paths;
+}
+
 /** The text to render on a `text` post's image: `cardText` if set, else the caption. */
 export function textCardContent(post) {
   return post.cardText ?? post.caption;
@@ -204,8 +222,9 @@ export function textCardContent(post) {
 
 /**
  * Dispatches rendering based on post.format. Returns the output media path
- * (a `.png` for the feed formats, a `.mp4` for `reel`), or null for the two
- * formats that carry manually-produced media instead (video/photo_text).
+ * (a `.png` for the single-image feed formats, a `.mp4` for `reel`, an array
+ * of `.png` paths for `carousel`), or null for the two formats that carry
+ * manually-produced media instead (video/photo_text).
  */
 export async function renderPostImage(post) {
   const outPath = path.join(OUTPUT_DIR, `${post.date}.png`);
@@ -236,6 +255,11 @@ export async function renderPostImage(post) {
       return renderTextCard({
         text: textCardContent(post),
         outPath,
+      });
+    case "carousel":
+      return renderCarouselImages({
+        slides: post.slides,
+        outPathPrefix: path.join(OUTPUT_DIR, post.date),
       });
     case "video":
     case "photo_text":

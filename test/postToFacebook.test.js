@@ -173,6 +173,59 @@ test("runScheduledPost does not publish a reel yet — it renders then skips wit
   assert.equal(fetchMock.mock.callCount(), 0);
 });
 
+const carouselEntry = {
+  date: "2026-09-28",
+  pillar: "educational_hook",
+  format: "carousel",
+  status: "draft",
+  slides: [{ text: "Step one." }, { text: "Step two." }, { text: "Step three." }],
+  caption: "3 steps to actually finish your to-do list.",
+};
+
+test("runScheduledPost --dry-run renders a carousel (all slides) and logs without calling the API", async (t) => {
+  const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
+  const calendar = [carouselEntry];
+  const result = await runScheduledPost({ date: "2026-09-28", calendar, dryRun: true });
+  assert.equal(result.skipped, true);
+  assert.equal(result.reason, "dry_run");
+  assert.ok(Array.isArray(result.imagePath));
+  assert.equal(result.imagePath.length, 3);
+  assert.equal(fetchMock.mock.callCount(), 0);
+});
+
+test("runScheduledPost publishes a carousel by uploading each slide unpublished then creating one feed post with attached_media", async (t) => {
+  let photoCallIndex = 0;
+  const fetchMock = t.mock.method(globalThis, "fetch", async (url) => {
+    if (String(url).endsWith("/photos")) {
+      photoCallIndex += 1;
+      return { ok: true, json: async () => ({ id: `photo-${photoCallIndex}` }) };
+    }
+    return { ok: true, json: async () => ({ id: "1", post_id: "1_1" }) };
+  });
+  const calendarPath = await makeCalendarFile([carouselEntry]);
+
+  const result = await runScheduledPost({ date: "2026-09-28", calendarPath, pageId: "PAGE", accessToken: "TOKEN" });
+
+  assert.equal(result.skipped, false);
+  assert.equal(fetchMock.mock.callCount(), 4); // 3 unpublished photo uploads + 1 feed post
+
+  for (const call of fetchMock.mock.calls.slice(0, 3)) {
+    assert.match(call.arguments[0], /\/PAGE\/photos$/);
+    assert.equal(call.arguments[1].body.get("published"), "false");
+  }
+
+  const feedCall = fetchMock.mock.calls[3];
+  assert.match(feedCall.arguments[0], /\/PAGE\/feed$/);
+  const feedBody = feedCall.arguments[1].body;
+  assert.equal(feedBody.get("message"), carouselEntry.caption);
+  assert.equal(feedBody.get("attached_media[0]"), JSON.stringify({ media_fbid: "photo-1" }));
+  assert.equal(feedBody.get("attached_media[1]"), JSON.stringify({ media_fbid: "photo-2" }));
+  assert.equal(feedBody.get("attached_media[2]"), JSON.stringify({ media_fbid: "photo-3" }));
+
+  const written = JSON.parse(await readFile(calendarPath, "utf-8"));
+  assert.equal(written[0].status, "posted");
+});
+
 test("re-running the same day skips the already-posted entry without a duplicate Facebook call", async (t) => {
   const fetchMock = t.mock.method(globalThis, "fetch", okFetch);
   const calendarPath = await makeCalendarFile([draftTextEntry]);
