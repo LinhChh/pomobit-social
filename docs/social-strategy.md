@@ -39,13 +39,16 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
 | "Your to-do list isn't guilt-tripping you" | 02/09 | 2 | 5 | 2 | 0 | 2 |
 | "Multitasking isn't productivity" | 29/08 | 2 | 19 | 2 | 0 | 2 |
 
-### Đã xác minh qua Graph API
-- Cả 2 bài tháng 9: `is_published: true`, `is_hidden: false`, `privacy: EVERYONE`.
-  **Bài đăng đúng, công khai, không bị ẩn — không phải lỗi code.**
+### Đã xác minh
+- **Graph API**: cả 2 bài tháng 9 `is_published: true`, `is_hidden: false`,
+  `privacy: EVERYONE`. Bài đăng đúng, công khai, không bị ẩn — không phải lỗi code.
 - Việc không thấy bài trong tab "Posts" (kể cả tài khoản admin) là do
   **cache của New Pages Experience** + khoảng trống 7 tháng làm feed module kẹt
   anchor. Grid "Photos" update nhanh hơn nên chỉ thấy ảnh. Mở permalink trực tiếp
   thì bài hiện bình thường.
+- **Page recommendation status: "Recommendable"** — "Your Page is now in lists
+  where we suggest Pages to new people." → **Page KHÔNG bị flag**, không có án
+  phạt phân phối. Đủ điều kiện được FB gợi ý tới người lạ.
 
 ---
 
@@ -73,8 +76,9 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
    views, không phải non-follower.)_
 3. **Không có seeding từ mạng lưới cá nhân** (ràng buộc: không mời được bạn bè
    like Page, không share được vào profile cá nhân).
-4. Page 8 tháng tuổi + 0 review + 200+ follower fake = hồ sơ dễ bị FB gắn nhãn
-   "low quality".
+
+_Không phải nguyên nhân_: Page **không bị FB flag** — Page recommendation status
+là "Recommendable". Reach thấp thuần do 3 lý do trên, không phải án phạt.
 
 ---
 
@@ -202,7 +206,7 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 
 | Vấn đề | Cần quyết |
 |---|---|
-| Page hiện tại có bị FB quality-flag không | Theo dõi reach Reels 2–3 tuần đầu; nếu Reels cũng chết bất thường → cân nhắc lập Page mới sạch |
+| ~~Page bị FB quality-flag?~~ | ✅ **Đã xác minh: KHÔNG.** Page recommendation status = "Recommendable". Bỏ nhánh "lập Page mới" trừ khi Reels test cũng chết bất thường _và_ status đổi |
 | Prune follower fake hay bỏ qua | Quyết sau khi thử remove ~20 account xem có dễ không |
 | Ngân sách ads | Nếu có: $3–5 boost cho **1 Reel đã chứng minh tốt**, target VN/English + productivity, để seed ~30–60 follower thật |
 | Nhạc cho video | Chọn 1 track CC0, ghi license trong `assets/audio/` (Issue #17) |
