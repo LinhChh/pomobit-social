@@ -1,6 +1,6 @@
 # Chiến lược xây dựng social cho Pomobit — Tình hình & Kế hoạch
 
-_Cập nhật: 2026-09-03 (rev. 2 — chốt hướng Ken Burns MVP)_
+_Cập nhật: 2026-09-05 (rev. 3 — confirmed bài đăng qua API không hiện trên wall)_
 
 Tài liệu này chốt lại hiện trạng kênh Facebook của Pomobit, chẩn đoán vì sao
 reach đang gần bằng 0, và định hướng đi tiếp. Nguồn dữ liệu: Meta Business Suite,
@@ -42,10 +42,18 @@ Graph API (`v26.0`), repo `LinhChh/pomobit-social`.
 ### Đã xác minh
 - **Graph API**: cả 2 bài tháng 9 `is_published: true`, `is_hidden: false`,
   `privacy: EVERYONE`. Bài đăng đúng, công khai, không bị ẩn — không phải lỗi code.
-- Việc không thấy bài trong tab "Posts" (kể cả tài khoản admin) là do
-  **cache của New Pages Experience** + khoảng trống 7 tháng làm feed module kẹt
-  anchor. Grid "Photos" update nhanh hơn nên chỉ thấy ảnh. Mở permalink trực tiếp
-  thì bài hiện bình thường.
+- **[CONFIRMED 2026-09-05, không còn là giả thuyết]** Bài đăng qua API **không
+  hiện trên wall/feed khi xem bằng tài khoản Facebook khác (không phải admin)**
+  — chỉ hiện trong tab "Photos", không hiện ở "Posts"/timeline chính. Test bằng
+  bài carousel mới nhất (đăng qua `/feed` + `attached_media`, không phải
+  `/photos` đơn thuần như trước) — vẫn bị y hệt, nên **không phải do endpoint
+  `/photos` vs `/feed`**, cũng không phải do tài khoản admin xem khác tài khoản
+  thường. Giả thuyết "cache của New Pages Experience + khoảng trống 7 tháng"
+  trước đây (mở permalink trực tiếp thì bài vẫn hiện) có thể chỉ là một phần
+  nguyên nhân — bài carousel này đăng **sau khi automation đã chạy đều đặn**
+  (không còn khoảng trống 7 tháng), nếu vẫn bị thì nghi ngờ đây là hành vi mặc
+  định của New Pages Experience với Page có ít tương tác/follower thật, không
+  đơn thuần là cache tạm thời. Cần điều tra thêm — xem mục 6.
 - **Page recommendation status: "Recommendable"** — "Your Page is now in lists
   where we suggest Pages to new people." → **Page KHÔNG bị flag**, không có án
   phạt phân phối. Đủ điều kiện được FB gợi ý tới người lạ.
@@ -207,6 +215,7 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 | Vấn đề | Cần quyết |
 |---|---|
 | ~~Page bị FB quality-flag?~~ | ✅ **Đã xác minh: KHÔNG.** Page recommendation status = "Recommendable". Bỏ nhánh "lập Page mới" trừ khi Reels test cũng chết bất thường _và_ status đổi |
+| **Bài đăng qua API không hiện trên wall khi xem bằng acc không phải admin** | ⚠️ **Confirmed 2026-09-05**, chưa rõ nguyên nhân gốc (không phải endpoint `/photos` vs `/feed`, không phải chỉ do admin session). Cần thử: đăng 1 bài **thủ công qua Meta Business Suite** (không qua API) rồi so sánh cùng cách xem bằng acc khác — nếu vẫn không hiện thì đây là vấn đề của Page (follower chết/reach thấp làm FB không phát tán), không phải vấn đề riêng của việc đăng qua API |
 | Prune follower fake hay bỏ qua | Quyết sau khi thử remove ~20 account xem có dễ không |
 | Ngân sách ads | Nếu có: $3–5 boost cho **1 Reel đã chứng minh tốt**, target VN/English + productivity, để seed ~30–60 follower thật |
 | Nhạc cho video | Chọn 1 track CC0, ghi license trong `assets/audio/` (Issue #17) |
@@ -218,7 +227,12 @@ Jobs**. Render.com cũng được nhưng vẫn phải xử lý writeback + mất
 ## 7. Next actions
 
 **Trước khi build:**
-- [ ] Kiểm tra tab "Posts" bằng incognito/mobile để xác nhận chỉ là cache
+- [x] Kiểm tra bằng acc Facebook khác (không phải admin) — **confirmed**: bài
+      đăng qua API không hiện trên wall/feed, chỉ hiện ở "Photos" (2026-09-05,
+      xem mục 1 & 6). Không phải chỉ là cache tạm thời như giả thuyết ban đầu.
+- [ ] Đăng thử 1 bài **thủ công qua Meta Business Suite** (không qua API), so
+      sánh cùng acc test — xác định đây là vấn đề Page (reach/follower) hay
+      vấn đề riêng của đường đăng qua API
 - [ ] Soạn ~15 câu one-liner/hook cho Reels → thêm entry `format: "reel"` vào `calendar.json`
 
 **Build (~1 tuần):**
