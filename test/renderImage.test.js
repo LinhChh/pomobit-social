@@ -28,10 +28,10 @@ async function readPixel(pngPath, x, y) {
   return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
 }
 
-test("COLORS uses the Pomobit app palette (navy text, green accent, white background) instead of the old cream/brown theme", () => {
-  assert.equal(COLORS.background, "#FFFFFF");
-  assert.equal(COLORS.textPrimary, "#111828");
-  assert.equal(COLORS.accent, "#309652");
+test("COLORS keeps the original cream background but recolors text/accent to the Pomobit app's blue (sampled from the tomato icon)", () => {
+  assert.equal(COLORS.background, "#f5ede0");
+  assert.equal(COLORS.textPrimary, "#0A4E95");
+  assert.equal(COLORS.accent, "#0384C8");
 });
 
 test("renderInfographic, renderQuoteCard, and renderTextCard share the same background color from COLORS", async () => {
@@ -52,9 +52,10 @@ test("renderInfographic, renderQuoteCard, and renderTextCard share the same back
     readPixel(textPath, 10, 10),
   ]);
 
-  assert.equal(infographicBg, COLORS.background);
-  assert.equal(quoteBg, COLORS.background);
-  assert.equal(textBg, COLORS.background);
+  const expectedBg = COLORS.background.toUpperCase();
+  assert.equal(infographicBg, expectedBg);
+  assert.equal(quoteBg, expectedBg);
+  assert.equal(textBg, expectedBg);
 });
 
 test("renderTextCard writes a non-empty PNG to the given path", async () => {

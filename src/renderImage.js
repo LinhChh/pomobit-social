@@ -12,15 +12,14 @@ const SIZE = 1080;
 export const BRAND = "POMOBIT";
 
 /**
- * Sampled from the Pomobit app logo — navy wordmark + green leaf on a white
- * ground — rather than the reel's dark blue gradient (REEL_COLORS in
- * reel.js): these cards sit in a light Facebook feed, not a full-screen 9:16
- * frame, so a light background reads better here.
+ * Keeps the original cream card background, but recolors text/accents to the
+ * app's actual brand blue — sampled from the tomato icon (light #0384C8,
+ * dark #0A4E95) — instead of the unrelated brown/orange placeholder.
  */
 export const COLORS = {
-  background: "#FFFFFF",
-  textPrimary: "#111828",
-  accent: "#309652",
+  background: "#f5ede0",
+  textPrimary: "#0A4E95",
+  accent: "#0384C8",
 };
 
 let fontsRegistered = false;
